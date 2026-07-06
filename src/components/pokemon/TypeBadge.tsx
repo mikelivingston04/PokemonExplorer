@@ -1,0 +1,33 @@
+import { Link } from 'react-router-dom'
+import { TYPE_COLORS, isPokemonType } from '@/lib/constants/typeColors'
+import { toDisplayName } from '@/lib/constants/nameOverrides'
+import { cn } from '@/lib/utils'
+
+interface TypeBadgeProps {
+  type: string
+  linkTo?: boolean
+  className?: string
+}
+
+export function TypeBadge({ type, linkTo = false, className }: TypeBadgeProps) {
+  const colors = isPokemonType(type) ? TYPE_COLORS[type] : { bg: '#999999', fg: '#ffffff' }
+  const label = toDisplayName(type)
+
+  const badge = (
+    <span
+      className={cn(
+        'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium leading-5',
+        linkTo && 'transition-opacity hover:opacity-80',
+        className,
+      )}
+      style={{ backgroundColor: colors.bg, color: colors.fg }}
+    >
+      {label}
+    </span>
+  )
+
+  if (linkTo) {
+    return <Link to={`/type/${type}`}>{badge}</Link>
+  }
+  return badge
+}
