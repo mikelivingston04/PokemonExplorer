@@ -21,8 +21,8 @@ export function PokemonGrid({ names, isLoading, checkingStatus }: PokemonGridPro
     return (
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
         {Array.from({ length: 12 }).map((_, i) => (
-          <div key={i} className="flex flex-col items-center gap-2 rounded-lg border p-3">
-            <div className="h-16 w-16 animate-pulse rounded-md bg-muted" />
+          <div key={i} className="flex flex-col items-center gap-2 rounded-xl border bg-card/60 p-3">
+            <div className="h-20 w-20 animate-pulse rounded-md bg-muted" />
             <div className="h-4 w-16 animate-pulse rounded bg-muted" />
           </div>
         ))}
@@ -48,7 +48,7 @@ export function PokemonGrid({ names, isLoading, checkingStatus }: PokemonGridPro
         {names.length} Pokémon
         {checkingStatus && <span> — {checkingStatus}</span>}
       </p>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+      <div className="grid grid-cols-2 items-stretch gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
         {visible.map((name) => (
           <PokemonCard key={name} name={name} />
         ))}

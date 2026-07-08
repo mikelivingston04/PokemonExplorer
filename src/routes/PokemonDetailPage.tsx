@@ -9,6 +9,7 @@ import { computeTypeEffectiveness } from '@/lib/typeEffectiveness'
 import { toDisplayName } from '@/lib/constants/nameOverrides'
 import { generationLabel } from '@/lib/constants/generations'
 import { DEFAULT_VERSION_GROUP } from '@/lib/constants/versionGroups'
+import { TYPE_COLORS, isPokemonType } from '@/lib/constants/typeColors'
 import { TypeBadge } from '@/components/pokemon/TypeBadge'
 import { SpriteImage } from '@/components/pokemon/SpriteImage'
 import { StatBars } from '@/components/pokemon/StatBars'
@@ -18,7 +19,24 @@ import { TypeEffectivenessChart } from '@/components/types/TypeEffectivenessChar
 import { LocationsList } from '@/components/pokemon/LocationsList'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { cn } from '@/lib/utils'
+
+function SectionCard({
+  title,
+  className,
+  children,
+}: {
+  title: string
+  className?: string
+  children: React.ReactNode
+}) {
+  return (
+    <section className={cn('flex flex-col gap-3 rounded-2xl border bg-card/60 p-5', className)}>
+      <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
+      {children}
+    </section>
+  )
+}
 
 export function PokemonDetailPage() {
   const { name } = useParams<{ name: string }>()
@@ -56,17 +74,24 @@ export function PokemonDetailPage() {
 
   const artwork = pokemon.sprites.other?.['official-artwork']?.front_default
   const dexNumber = String(pokemon.id).padStart(3, '0')
+  const glowColor = primaryType && isPokemonType(primaryType) ? TYPE_COLORS[primaryType].bg : undefined
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-        <div className="flex shrink-0 items-end gap-1">
+    <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-5 rounded-2xl border bg-card/60 p-5 sm:flex-row sm:items-center">
+        <div className="relative flex shrink-0 items-end gap-1">
+          {glowColor && (
+            <div
+              className="absolute inset-0 -z-0 rounded-full opacity-40 blur-2xl"
+              style={{ backgroundColor: glowColor }}
+            />
+          )}
           <SpriteImage
             src={artwork ?? pokemon.sprites.front_default}
             alt={pokemon.name}
-            className="h-28 w-28"
+            className="relative z-10 h-28 w-28"
           />
-          <SpriteImage src={pokemon.sprites.back_default} alt="" className="h-16 w-16 opacity-70" />
+          <SpriteImage src={pokemon.sprites.back_default} alt="" className="relative z-10 h-16 w-16 opacity-70" />
         </div>
         <div className="flex flex-col gap-1.5">
           <span className="text-sm text-muted-foreground tabular-nums">#{dexNumber}</span>
@@ -82,32 +107,26 @@ export function PokemonDetailPage() {
         </div>
       </div>
 
-      <Tabs defaultValue="stats">
-        <TabsList>
-          <TabsTrigger value="stats">Stats</TabsTrigger>
-          <TabsTrigger value="evolution">Evolution</TabsTrigger>
-          <TabsTrigger value="moves">Moves</TabsTrigger>
-          <TabsTrigger value="matchups">Type Matchups</TabsTrigger>
-          <TabsTrigger value="locations">Locations</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="stats">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <SectionCard title="Base Stats">
           <StatBars stats={pokemon.stats} />
-        </TabsContent>
+        </SectionCard>
 
-        <TabsContent value="evolution">
+        <SectionCard title="Evolution Chain">
           {evoChain ? (
-            <EvolutionChainView node={flattenChain(evoChain.chain)} />
+            <div className="overflow-x-auto">
+              <EvolutionChainView node={flattenChain(evoChain.chain)} />
+            </div>
           ) : (
-            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-24 w-full" />
           )}
-        </TabsContent>
+        </SectionCard>
 
-        <TabsContent value="moves">
+        <SectionCard title="Moves">
           <MoveListTable moves={pokemon.moves} versionGroup={DEFAULT_VERSION_GROUP} />
-        </TabsContent>
+        </SectionCard>
 
-        <TabsContent value="matchups">
+        <SectionCard title="Type Matchups">
           {primaryTypeData ? (
             <TypeEffectivenessChart
               multipliers={computeTypeEffectiveness(
@@ -118,12 +137,12 @@ export function PokemonDetailPage() {
           ) : (
             <Skeleton className="h-32 w-full" />
           )}
-        </TabsContent>
+        </SectionCard>
 
-        <TabsContent value="locations">
+        <SectionCard title="Locations" className="lg:col-span-2">
           <LocationsList pokemonId={pokemon.id} />
-        </TabsContent>
-      </Tabs>
+        </SectionCard>
+      </div>
     </div>
   )
 }

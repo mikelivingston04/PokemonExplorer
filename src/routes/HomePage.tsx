@@ -4,7 +4,6 @@ import { filterStateFromSearchParams, filterStateToSearchParams } from '@/lib/ur
 import { useFilteredPokemon } from '@/lib/queries/useFilteredPokemon'
 import { useExpensiveFilteredPokemon } from '@/lib/queries/useExpensiveFilteredPokemon'
 import { FilterPanelContent } from '@/components/layout/FilterPanelContent'
-import { FilterSheet } from '@/components/layout/FilterSheet'
 import { PokemonGrid } from '@/components/pokemon/PokemonGrid'
 import type { FilterState } from '@/lib/filterEngine/types'
 
@@ -39,25 +38,17 @@ export function HomePage() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Search &amp; Filter</h1>
-          <p className="text-sm text-muted-foreground">
-            Find Pokémon, moves, TMs, and types.
-          </p>
-        </div>
-        <FilterSheet filters={filters} onChange={updateFilters} />
+    <div className="flex flex-col gap-5">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Search &amp; Filter</h1>
+        <p className="text-sm text-muted-foreground">
+          Find Pokémon, moves, TMs, and types.
+        </p>
       </div>
 
-      <div className="flex gap-6">
-        <aside className="hidden w-64 shrink-0 lg:block">
-          <FilterPanelContent filters={filters} onChange={updateFilters} />
-        </aside>
-        <div className="min-w-0 flex-1">
-          <PokemonGrid names={names} isLoading={isLoading} checkingStatus={checkingStatus} />
-        </div>
-      </div>
+      <FilterPanelContent filters={filters} onChange={updateFilters} />
+
+      <PokemonGrid names={names} isLoading={isLoading} checkingStatus={checkingStatus} />
     </div>
   )
 }
