@@ -1,0 +1,69 @@
+@use 'styles/mixins' as *;
+
+.empty {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.tile {
+  @include card-link;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  text-align: left;
+}
+
+.tileHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.tileName {
+  font-weight: 600;
+}
+
+.tileBadges {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.stats {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.statBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.statBlockEnd {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.125rem;
+  text-align: right;
+}
+
+.statLabel {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+
+  @include sm {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

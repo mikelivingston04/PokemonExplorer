@@ -9,7 +9,6 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command'
-import { Button } from '@/components/ui/button'
 import { useSearchIndex, type SearchCategory, type SearchIndexEntry } from '@/lib/queries/useSearchIndex'
 import { usePokemon } from '@/lib/queries/usePokemon'
 import { useMove } from '@/lib/queries/useMove'
@@ -19,6 +18,7 @@ import { SpriteImage } from '@/components/pokemon/SpriteImage'
 import { TYPE_ICONS } from '@/lib/constants/typeIcons'
 import { isPokemonType, TYPE_COLORS } from '@/lib/constants/typeColors'
 import { SearchIcon } from 'lucide-react'
+import styles from './CommandSearch.module.scss'
 
 const CATEGORY_LABELS: Record<SearchCategory, string> = {
   pokemon: 'Pokémon',
@@ -44,11 +44,7 @@ function TileShell({
   children: React.ReactNode
 }) {
   return (
-    <CommandItem
-      value={value}
-      onSelect={onSelect}
-      className="w-fit gap-2.5 rounded-lg border bg-card/60 px-2.5 py-2 data-selected:border-foreground/25 data-selected:bg-card"
-    >
+    <CommandItem value={value} onSelect={onSelect} className={styles.tile}>
       {children}
     </CommandItem>
   )
@@ -60,17 +56,13 @@ function PokemonTile({ entry, onSelect }: { entry: SearchIndexEntry; onSelect: (
 
   return (
     <TileShell value={entry.displayName} onSelect={onSelect}>
-      <SpriteImage src={sprite} alt="" className="h-9 w-9 object-contain" />
-      <div className="flex flex-col items-start gap-0.5">
-        <span className="text-sm font-medium leading-none">{entry.displayName}</span>
-        {pokemon && (
-          <span className="text-xs text-muted-foreground tabular-nums">
-            #{String(pokemon.id).padStart(3, '0')}
-          </span>
-        )}
+      <SpriteImage src={sprite} alt="" className={styles.pokemonSprite} />
+      <div className={styles.tileText}>
+        <span className={styles.tileName}>{entry.displayName}</span>
+        {pokemon && <span className={styles.tileMeta}>#{String(pokemon.id).padStart(3, '0')}</span>}
       </div>
       {pokemon && (
-        <div className="flex flex-col gap-1">
+        <div className={styles.tileTypeStack}>
           {pokemon.types.map((t) => (
             <TypeBadge key={t.type.name} type={t.type.name} />
           ))}
@@ -88,16 +80,16 @@ function MoveTile({ entry, onSelect }: { entry: SearchIndexEntry; onSelect: () =
 
   return (
     <TileShell value={entry.displayName} onSelect={onSelect}>
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-muted/60">
-        {Icon && <Icon className="size-4.5" style={{ color: iconColor }} />}
+      <span className={styles.moveIcon}>
+        {Icon && <Icon className={styles.moveIconSvg} style={{ color: iconColor }} />}
       </span>
-      <div className="flex flex-col items-start gap-0.5">
-        <div className="flex items-center gap-1.5">
-          <span className="text-sm font-medium leading-none">{entry.displayName}</span>
+      <div className={styles.tileText}>
+        <div className={styles.moveNameRow}>
+          <span className={styles.tileName}>{entry.displayName}</span>
           {type && <TypeBadge type={type} />}
         </div>
         {move && (
-          <span className="text-xs text-muted-foreground tabular-nums">
+          <span className={styles.tileMeta}>
             Power: {move.power ?? '—'} · Acc: {move.accuracy ?? '—'}
           </span>
         )}
@@ -112,11 +104,11 @@ function TypeTile({ entry, onSelect }: { entry: SearchIndexEntry; onSelect: () =
 
   return (
     <TileShell value={entry.displayName} onSelect={onSelect}>
-      <TypeBadge type={entry.name} className="text-sm" />
+      <TypeBadge type={entry.name} className={styles.typeTileBadge} />
       {strongAgainst.length > 0 && (
-        <div className="flex flex-col items-start gap-1">
-          <span className="text-xs text-muted-foreground">Strong against</span>
-          <div className="flex flex-wrap gap-1">
+        <div className={styles.tileText}>
+          <span className={styles.strongAgainstLabel}>Strong against</span>
+          <div className={styles.strongAgainstBadges}>
             {strongAgainst.map((t) => (
               <TypeBadge key={t.name} type={t.name} />
             ))}
@@ -129,11 +121,7 @@ function TypeTile({ entry, onSelect }: { entry: SearchIndexEntry; onSelect: () =
 
 function SeeAllTile({ count, onClick }: { count: number; onClick: () => void }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex h-full w-fit items-center rounded-lg border border-dashed px-3 py-2 text-sm text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
-    >
+    <button type="button" onClick={onClick} className={styles.seeAll}>
       See all {count} results
     </button>
   )
@@ -187,32 +175,24 @@ export function CommandSearch() {
 
   return (
     <>
-      <Button
-        variant="outline"
-        size="icon"
-        className="text-muted-foreground sm:hidden"
+      <button
+        type="button"
         onClick={() => setOpen(true)}
-        aria-label="Search"
+        aria-label="Search Pokémon, moves, or types"
+        className={styles.trigger}
       >
-        <SearchIcon className="size-4" />
-      </Button>
-      <Button
-        variant="outline"
-        className="hidden w-56 justify-start gap-2 text-muted-foreground sm:flex"
-        onClick={() => setOpen(true)}
-      >
-        <SearchIcon className="size-4" />
-        Search Pokémon, moves...
-        <kbd className="ml-auto rounded border bg-muted px-1.5 py-0.5 text-xs">⌘K</kbd>
-      </Button>
-      <CommandDialog open={open} onOpenChange={setOpen} className="sm:max-w-2xl">
+        <SearchIcon className={styles.triggerIcon} />
+        <span className={styles.triggerLabel}>Search Pokémon, moves, or types...</span>
+        <kbd className={styles.kbd}>⌘K</kbd>
+      </button>
+      <CommandDialog open={open} onOpenChange={setOpen} className={styles.dialog}>
         <Command shouldFilter={false}>
           <CommandInput
             placeholder="Search Pokémon, moves, or types..."
             value={query}
             onValueChange={setQuery}
           />
-          <CommandList>
+          <CommandList className={styles.list}>
             {filtered.length === 0 && <CommandEmpty>No results found.</CommandEmpty>}
             {(['pokemon', 'move', 'type'] as const).map((category) => {
               const categoryEntries = byCategory[category]
@@ -222,11 +202,7 @@ export function CommandSearch() {
               const remaining = categoryEntries.length - visible.length
 
               return (
-                <CommandGroup
-                  key={category}
-                  heading={CATEGORY_LABELS[category]}
-                  className="**:[[cmdk-group-items]]:flex **:[[cmdk-group-items]]:flex-wrap **:[[cmdk-group-items]]:gap-2"
-                >
+                <CommandGroup key={category} heading={CATEGORY_LABELS[category]} className={styles.tileGroup}>
                   {visible.map((entry) => {
                     const onSelect = () => select(category, entry.name)
                     if (category === 'pokemon') return <PokemonTile key={entry.name} entry={entry} onSelect={onSelect} />

@@ -7,6 +7,7 @@ import { TypeEffectivenessChart } from '@/components/types/TypeEffectivenessChar
 import { PokemonLinkGrid } from '@/components/pokemon/PokemonLinkGrid'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Skeleton } from '@/components/ui/skeleton'
+import styles from './TypeDetailPage.module.scss'
 
 export function TypeDetailPage() {
   const { name } = useParams<{ name: string }>()
@@ -14,22 +15,22 @@ export function TypeDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-6">
-        <Skeleton className="h-10 w-32" />
-        <Skeleton className="h-64 w-full" />
+      <div className={styles.loadingWrapper}>
+        <Skeleton style={{ height: '2.5rem', width: '8rem' }} />
+        <Skeleton style={{ height: '16rem', width: '100%' }} />
       </div>
     )
   }
 
   if (isError || !type) {
-    return <p className="text-sm text-destructive">Couldn't find a type named "{name}".</p>
+    return <p className={styles.notFound}>Couldn't find a type named "{name}".</p>
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center gap-3">
-        <TypeBadge type={type.name} className="px-4 py-1 text-base" />
-        <h1 className="text-2xl font-semibold tracking-tight">{toDisplayName(type.name)}-type</h1>
+    <div className={styles.page}>
+      <div className={styles.header}>
+        <TypeBadge type={type.name} className={styles.headerBadge} />
+        <h1 className={styles.title}>{toDisplayName(type.name)}-type</h1>
       </div>
 
       <Tabs defaultValue="offense">
@@ -40,17 +41,17 @@ export function TypeDetailPage() {
         </TabsList>
 
         <TabsContent value="offense">
-          <p className="mb-3 text-sm text-muted-foreground">
+          <p className={styles.tabIntro}>
             Damage dealt by {toDisplayName(type.name)}-type moves against each type.
           </p>
-          <TypeEffectivenessChart multipliers={computeOffensiveEffectiveness(type.damage_relations)} />
+          <TypeEffectivenessChart perspective="offense" multipliers={computeOffensiveEffectiveness(type.damage_relations)} />
         </TabsContent>
 
         <TabsContent value="defense">
-          <p className="mb-3 text-sm text-muted-foreground">
+          <p className={styles.tabIntro}>
             Damage taken by {toDisplayName(type.name)}-type Pokémon from each type.
           </p>
-          <TypeEffectivenessChart multipliers={computeTypeEffectiveness(type.damage_relations)} />
+          <TypeEffectivenessChart perspective="defense" multipliers={computeTypeEffectiveness(type.damage_relations)} />
         </TabsContent>
 
         <TabsContent value="pokemon">

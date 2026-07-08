@@ -1,0 +1,184 @@
+@use 'styles/mixins' as *;
+
+.trigger {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.625rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklch, var(--card), transparent 40%);
+  padding: 0.625rem 1rem;
+  color: var(--muted-foreground);
+  box-shadow: 0 1px 2px oklch(0 0 0 / 0.06);
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  cursor: pointer;
+
+  &:hover {
+    border-color: color-mix(in oklch, var(--foreground), transparent 80%);
+    background: var(--card);
+    color: var(--foreground);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring), transparent 50%);
+  }
+}
+
+.triggerIcon {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+}
+
+.triggerLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+}
+
+.kbd {
+  margin-left: auto;
+  flex-shrink: 0;
+  display: none;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--muted);
+  padding: 0.125rem 0.375rem;
+  font-size: 0.75rem;
+
+  @include sm {
+    display: inline;
+  }
+}
+
+.dialog {
+  top: 6%;
+  max-height: 88vh;
+
+  @include sm {
+    max-width: 56rem;
+  }
+}
+
+.list {
+  max-height: 75vh;
+
+  @include sm {
+    max-height: 42rem;
+  }
+}
+
+// The default CommandGroup lays items out as a vertical list (right for
+// MoveCombobox's plain move list) — here we want a wrapping grid of tiles
+// instead, so items flex-wrap within cmdk's own items container.
+.tileGroup {
+  :global([cmdk-group-items]) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}
+
+.tile {
+  width: fit-content;
+  gap: 0.625rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: color-mix(in oklch, var(--card), transparent 40%);
+  padding: 0.5rem 0.625rem;
+
+  &[data-selected] {
+    border-color: color-mix(in oklch, var(--foreground), transparent 75%);
+    background: var(--card);
+  }
+}
+
+.pokemonSprite {
+  height: 2.25rem;
+  width: 2.25rem;
+  object-fit: contain;
+}
+
+.tileText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.125rem;
+}
+
+.tileName {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.tileMeta {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.tileTypeStack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.moveIcon {
+  display: flex;
+  height: 2.25rem;
+  width: 2.25rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  background: color-mix(in oklch, var(--muted), transparent 40%);
+}
+
+.moveIconSvg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.moveNameRow {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.typeTileBadge {
+  font-size: 0.875rem;
+}
+
+.strongAgainstLabel {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.strongAgainstBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.seeAll {
+  display: flex;
+  height: 100%;
+  width: fit-content;
+  align-items: center;
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--border);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  transition: color 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+
+  &:hover {
+    border-color: color-mix(in oklch, var(--foreground), transparent 70%);
+    color: var(--foreground);
+  }
+}

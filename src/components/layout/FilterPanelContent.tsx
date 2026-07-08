@@ -1,13 +1,26 @@
 import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { MoveCombobox } from '@/components/search/MoveCombobox'
 import { TYPE_COLORS, ALL_TYPE_NAMES } from '@/lib/constants/typeColors'
 import { toDisplayName } from '@/lib/constants/nameOverrides'
 import { DEFAULT_FILTER_STATE, isFilterActive, type FilterState } from '@/lib/filterEngine/types'
 import { cn } from '@/lib/utils'
+import styles from './FilterPanelContent.module.scss'
 
 const GENERATIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+// Passed as base-ui Select's `items` map so the trigger's collapsed
+// SelectValue can resolve a value like "level-up" back to its label —
+// without it, SelectValue falls back to rendering the raw value string.
+const LEARN_METHOD_LABELS: Record<string, string> = {
+  any: 'Any method',
+  'level-up': 'Level-up',
+  machine: 'TM / HM',
+  tutor: 'Tutor',
+  egg: 'Egg',
+}
 
 type CategoryKey = 'generation' | 'type' | 'learnsMove' | 'legendary' | 'evolution'
 
@@ -26,7 +39,7 @@ function categoryHasValue(key: CategoryKey, filters: FilterState): boolean {
     case 'type':
       return filters.types.length > 0
     case 'learnsMove':
-      return !!filters.learnsMove
+      return !!filters.learnsMove || filters.learnMethod !== 'any'
     case 'legendary':
       return filters.legendaryStatus !== 'any'
     case 'evolution':
@@ -43,28 +56,18 @@ function CategoryToggle({
   label,
   active,
   hasValue,
-  onClick,
+  onToggle,
 }: {
   label: string
   active: boolean
   hasValue: boolean
-  onClick: () => void
+  onToggle: (next: boolean) => void
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={cn(
-        'inline-flex items-center gap-1.5 rounded-full border-2 px-3.5 py-1.5 text-sm font-medium transition-colors',
-        hasValue
-          ? 'border-primary bg-primary text-primary-foreground'
-          : 'border-border bg-transparent text-muted-foreground hover:border-foreground/30 hover:text-foreground',
-        active && !hasValue && 'border-foreground/40 text-foreground',
-      )}
-    >
-      {label}
-    </button>
+    <label className={styles.toggle}>
+      <Switch checked={active} onCheckedChange={onToggle} />
+      <span className={hasValue ? styles.toggleLabelActive : styles.toggleLabel}>{label}</span>
+    </label>
   )
 }
 
@@ -84,13 +87,7 @@ function Pill({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={cn(
-        'inline-flex items-center rounded-full border-2 px-3 py-1 text-sm font-medium transition-colors',
-        !style &&
-          (active
-            ? 'border-primary bg-primary text-primary-foreground'
-            : 'border-border bg-transparent text-muted-foreground hover:border-foreground/30 hover:text-foreground'),
-      )}
+      className={cn(styles.pill, !style && (active ? styles.pillActive : styles.pillNeutral))}
       style={style}
     >
       {children}
@@ -131,26 +128,26 @@ export function FilterPanelContent({ filters, onChange }: FilterPanelContentProp
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-wrap items-center gap-2">
+    <div className={styles.panel}>
+      <div className={styles.categoryRow}>
         {CATEGORIES.map((c) => (
           <CategoryToggle
             key={c.key}
             label={c.label}
             active={expanded.has(c.key)}
             hasValue={categoryHasValue(c.key, filters)}
-            onClick={() => toggleCategory(c.key)}
+            onToggle={() => toggleCategory(c.key)}
           />
         ))}
         {isFilterActive(filters) && (
-          <Button variant="ghost" size="sm" className="ml-auto" onClick={() => onChange(DEFAULT_FILTER_STATE)}>
+          <Button variant="ghost" size="sm" className={styles.clearAll} onClick={() => onChange(DEFAULT_FILTER_STATE)}>
             Clear all
           </Button>
         )}
       </div>
 
       {expanded.has('generation') && (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className={styles.optionsRow}>
           {GENERATIONS.map((gen) => {
             const active = filters.generations.includes(gen)
             return (
@@ -174,7 +171,7 @@ export function FilterPanelContent({ filters, onChange }: FilterPanelContentProp
       )}
 
       {expanded.has('type') && (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className={styles.optionsRow}>
           {ALL_TYPE_NAMES.map((type) => {
             const active = filters.types.includes(type)
             const colors = TYPE_COLORS[type]
@@ -202,21 +199,21 @@ export function FilterPanelContent({ filters, onChange }: FilterPanelContentProp
       )}
 
       {expanded.has('learnsMove') && (
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="w-56">
-            <MoveCombobox
-              value={filters.learnsMove}
-              onChange={(move) =>
-                onChange({ ...filters, learnsMove: move, learnMethod: move ? filters.learnMethod : 'any' })
-              }
-            />
-          </div>
-          {filters.learnsMove && (
+        <div className={styles.learnsMoveBlock}>
+          <p className={styles.hint}>Pick a specific move, a learn method, or both together.</p>
+          <div className={styles.optionsRow}>
+            <div className={styles.moveComboboxWrapper}>
+              <MoveCombobox
+                value={filters.learnsMove}
+                onChange={(move) => onChange({ ...filters, learnsMove: move })}
+              />
+            </div>
             <Select
+              items={LEARN_METHOD_LABELS}
               value={filters.learnMethod}
               onValueChange={(value) => onChange({ ...filters, learnMethod: value as FilterState['learnMethod'] })}
             >
-              <SelectTrigger className="w-40">
+              <SelectTrigger className={styles.methodSelect}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -227,12 +224,12 @@ export function FilterPanelContent({ filters, onChange }: FilterPanelContentProp
                 <SelectItem value="egg">Egg</SelectItem>
               </SelectContent>
             </Select>
-          )}
+          </div>
         </div>
       )}
 
       {expanded.has('legendary') && (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className={styles.optionsRow}>
           {(['legendary', 'non-legendary'] as const).map((status) => {
             const active = filters.legendaryStatus === status
             return (
@@ -249,7 +246,7 @@ export function FilterPanelContent({ filters, onChange }: FilterPanelContentProp
       )}
 
       {expanded.has('evolution') && (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className={styles.optionsRow}>
           {(['basic', 'stage1', 'stage2'] as const).map((stage) => {
             const active = filters.evolutionStage === stage
             const label = stage === 'basic' ? 'Basic' : stage === 'stage1' ? 'Stage 1' : 'Stage 2'

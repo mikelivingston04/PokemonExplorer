@@ -1,0 +1,52 @@
+// Shared SCSS mixins — plain authoring convenience (nesting/repetition
+// helpers), not a design-token store. Design values (colors, sizes) still
+// live in src/index.css as CSS custom properties so they stay inspectable
+// and editable at runtime; see that file's "Easy tweaks" section.
+
+// Breakpoints matching the app's previous Tailwind config (sm/md/lg).
+@mixin sm {
+  @media (min-width: 640px) {
+    @content;
+  }
+}
+@mixin md {
+  @media (min-width: 768px) {
+    @content;
+  }
+}
+@mixin lg {
+  @media (min-width: 1024px) {
+    @content;
+  }
+}
+
+// The responsive column-count used by the Pokémon results grid (2 → 3 → 4 → 6).
+@mixin pokemon-grid-cols {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  @include sm {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  @include md {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  @include lg {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+// The clickable card pattern used by Pokémon/move/evolution tiles: a bordered
+// box that lightens slightly on hover.
+@mixin card-link {
+  display: flex;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  background: color-mix(in oklch, var(--card), transparent 40%);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  text-align: center;
+
+  &:hover {
+    border-color: color-mix(in oklch, var(--foreground), transparent 80%);
+    background: var(--card);
+  }
+}

@@ -30,7 +30,10 @@ export function useExpensiveFilteredPokemon(
 ): ExpensiveFilterResult {
   const needsLegendaryCheck = filters.legendaryStatus !== 'any'
   const needsStageCheck = filters.evolutionStage !== 'any'
-  const needsMethodCheck = filters.learnMethod !== 'any' && !!filters.learnsMove
+  // A method filter is meaningful on its own ("learns anything via TM") or
+  // paired with a specific move ("learns Flamethrower via TM specifically") —
+  // either combination requires each candidate's full moveset.
+  const needsMethodCheck = filters.learnMethod !== 'any'
 
   const afterLegendary = useMemo(() => {
     if (!needsLegendaryCheck) return tier1Names
@@ -115,12 +118,14 @@ export function useExpensiveFilteredPokemon(
     for (const q of pokemonQueries) {
       const p = q.data
       if (!p) continue
-      const matches = p.moves.some((m) =>
-        m.move.name === filters.learnsMove &&
-        m.version_group_details.some(
+      // With no specific move selected, any move learned via this method
+      // counts; with a move selected, that move must be the one learned via it.
+      const matches = p.moves.some((m) => {
+        if (filters.learnsMove && m.move.name !== filters.learnsMove) return false
+        return m.version_group_details.some(
           (d) => d.version_group.name === filters.versionGroup && d.move_learn_method.name === filters.learnMethod,
-        ),
-      )
+        )
+      })
       if (matches) passing.add(p.name)
     }
     return afterStage.filter((name) => passing.has(name))

@@ -48,3 +48,20 @@ export function bucketLabel(m: Multiplier): string {
   if (m === 0) return 'No effect'
   return `${m}×`
 }
+
+export type EffectivenessPerspective = 'defense' | 'offense'
+
+// A raw "2×" or "0.5×" doesn't say which direction it cuts — this spells it
+// out in plain language so the multiplier is a confirmation, not a puzzle.
+export function perspectiveLabel(m: Multiplier, perspective: EffectivenessPerspective): string {
+  if (perspective === 'defense') {
+    if (m === 0) return 'Immune to'
+    if (m > 1) return `Weak to (${bucketLabel(m)})`
+    if (m < 1) return `Resists (${bucketLabel(m)})`
+    return `Neutral (${bucketLabel(m)})`
+  }
+  if (m === 0) return 'No effect on'
+  if (m > 1) return `Super effective (${bucketLabel(m)})`
+  if (m < 1) return `Not very effective (${bucketLabel(m)})`
+  return `Neutral (${bucketLabel(m)})`
+}

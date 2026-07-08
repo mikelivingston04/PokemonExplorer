@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { TYPE_COLORS, isPokemonType } from '@/lib/constants/typeColors'
 import { toDisplayName } from '@/lib/constants/nameOverrides'
 import { cn } from '@/lib/utils'
+import styles from './TypeBadge.module.scss'
 
 interface TypeBadgeProps {
   type: string
@@ -15,11 +16,7 @@ export function TypeBadge({ type, linkTo = false, className }: TypeBadgeProps) {
 
   const badge = (
     <span
-      className={cn(
-        'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium leading-5',
-        linkTo && 'transition-opacity hover:opacity-80',
-        className,
-      )}
+      className={cn(styles.badge, linkTo && styles.link, className)}
       style={{ backgroundColor: colors.bg, color: colors.fg }}
     >
       {label}

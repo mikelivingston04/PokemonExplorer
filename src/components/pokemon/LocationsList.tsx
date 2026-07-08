@@ -2,6 +2,7 @@ import { usePokemonEncounters } from '@/lib/queries/usePokemon'
 import { toDisplayName } from '@/lib/constants/nameOverrides'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DEFAULT_VERSION_GROUP } from '@/lib/constants/versionGroups'
+import styles from './LocationsList.module.scss'
 
 // FireRed/LeafGreen ship as a single "version" pair sharing one version_group;
 // PokéAPI's encounter data is keyed by version (e.g. "firered"), not version_group.
@@ -12,10 +13,10 @@ export function LocationsList({ pokemonId }: { pokemonId: number }) {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-2">
-        <Skeleton className="h-8 w-full" />
-        <Skeleton className="h-8 w-full" />
-        <Skeleton className="h-8 w-3/4" />
+      <div className={styles.skeletonList}>
+        <Skeleton style={{ height: '2rem', width: '100%' }} />
+        <Skeleton style={{ height: '2rem', width: '100%' }} />
+        <Skeleton style={{ height: '2rem', width: '75%' }} />
       </div>
     )
   }
@@ -29,7 +30,7 @@ export function LocationsList({ pokemonId }: { pokemonId: number }) {
 
   if (relevant.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground">
+      <p className={styles.empty}>
         Not obtainable by catching in {toDisplayName(DEFAULT_VERSION_GROUP)}. It may evolve from
         another Pokémon or require trading/breeding instead.
       </p>
@@ -37,9 +38,9 @@ export function LocationsList({ pokemonId }: { pokemonId: number }) {
   }
 
   return (
-    <ul className="flex flex-col divide-y">
+    <ul className={styles.list}>
       {relevant.map((entry) => (
-        <li key={entry.locationArea} className="py-2 text-sm">
+        <li key={entry.locationArea} className={styles.item}>
           {toDisplayName(entry.locationArea)}
         </li>
       ))}

@@ -1,0 +1,132 @@
+.command {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  background: var(--popover);
+  padding: 0.25rem;
+  color: var(--popover-foreground);
+}
+
+.dialogContent {
+  top: 6%;
+  max-height: 88vh;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  padding: 0;
+
+  @media (min-width: 640px) {
+    max-width: 56rem;
+  }
+}
+
+.inputWrapper {
+  padding: 0.25rem 0.25rem 0;
+}
+
+.inputGroup {
+  height: 2rem;
+  border-radius: var(--radius-lg);
+  border-color: color-mix(in oklch, var(--input), transparent 70%);
+  background: color-mix(in oklch, var(--input), transparent 70%);
+  box-shadow: none;
+
+  [data-slot='input-group-addon'] {
+    padding-left: 0.5rem;
+  }
+}
+
+.searchIcon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  opacity: 0.5;
+}
+
+.input {
+  width: 100%;
+  font-size: 0.875rem;
+  outline: none;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+.list {
+  max-height: 75vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  outline: none;
+  scroll-padding-block: 0.25rem;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (min-width: 640px) {
+    max-height: 42rem;
+  }
+}
+
+.empty {
+  padding: 1.5rem 0;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.group {
+  overflow: hidden;
+  padding: 0.25rem;
+  color: var(--foreground);
+
+  [cmdk-group-heading] {
+    padding: 0 0.5rem;
+    padding-block: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+  }
+}
+
+.item {
+  position: relative;
+  display: flex;
+  cursor: default;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.125rem;
+  padding: 0.375rem 0.5rem;
+  font-size: 0.875rem;
+  outline: none;
+  user-select: none;
+
+  &[data-disabled='true'] {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  &[data-selected] {
+    background: var(--muted);
+    color: var(--foreground);
+  }
+}
+
+// Scoped narrowly (not a blanket "svg" selector) so it doesn't fight the
+// deliberate sizing on icons/sprites rendered inside a CommandItem's own
+// children (e.g. type icons in the search modal's move tiles).
+.checkIcon {
+  pointer-events: none;
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  margin-left: auto;
+  opacity: 0;
+
+  &[data-checked='true'] {
+    opacity: 1;
+  }
+}

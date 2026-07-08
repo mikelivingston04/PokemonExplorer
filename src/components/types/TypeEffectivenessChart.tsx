@@ -1,14 +1,18 @@
-import { EFFECTIVENESS_BUCKETS, bucketLabel, type Multiplier } from '@/lib/typeEffectiveness'
+import { EFFECTIVENESS_BUCKETS, perspectiveLabel, type EffectivenessPerspective, type Multiplier } from '@/lib/typeEffectiveness'
 import type { PokemonType } from '@/lib/constants/typeColors'
 import { TypeBadge } from '@/components/pokemon/TypeBadge'
+import styles from './TypeEffectivenessChart.module.scss'
 
 interface TypeEffectivenessChartProps {
   multipliers: Record<PokemonType, Multiplier>
+  // 'defense' = "this takes N× damage from...", 'offense' = "this deals N×
+  // damage to..." — same multipliers, opposite plain-language framing.
+  perspective: EffectivenessPerspective
   // Neutral (1x) matchups are rarely useful to scan — hide by default.
   showNeutral?: boolean
 }
 
-export function TypeEffectivenessChart({ multipliers, showNeutral = false }: TypeEffectivenessChartProps) {
+export function TypeEffectivenessChart({ multipliers, perspective, showNeutral = false }: TypeEffectivenessChartProps) {
   const buckets = EFFECTIVENESS_BUCKETS.filter((m) => m !== 1 || showNeutral)
     .map((m) => ({
       multiplier: m,
@@ -17,17 +21,15 @@ export function TypeEffectivenessChart({ multipliers, showNeutral = false }: Typ
     .filter((b) => b.types.length > 0)
 
   if (buckets.length === 0) {
-    return <p className="text-sm text-muted-foreground">No notable matchups.</p>
+    return <p className={styles.empty}>No notable matchups.</p>
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className={styles.list}>
       {buckets.map((bucket) => (
-        <div key={bucket.multiplier} className="flex items-center gap-3">
-          <span className="w-14 shrink-0 text-sm font-medium tabular-nums text-muted-foreground">
-            {bucketLabel(bucket.multiplier)}
-          </span>
-          <div className="flex flex-wrap gap-1.5">
+        <div key={bucket.multiplier} className={styles.row}>
+          <span className={styles.label}>{perspectiveLabel(bucket.multiplier, perspective)}</span>
+          <div className={styles.badges}>
             {bucket.types.map((t) => (
               <TypeBadge key={t} type={t} linkTo />
             ))}

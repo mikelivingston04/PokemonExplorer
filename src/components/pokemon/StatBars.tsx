@@ -1,4 +1,5 @@
 import type { PokemonStat } from '@/types/pokeapi'
+import styles from './StatBars.module.scss'
 
 const STAT_LABELS: Record<string, string> = {
   hp: 'HP',
@@ -12,33 +13,56 @@ const STAT_LABELS: Record<string, string> = {
 // Theoretical max base stat across all Pokémon (Blissey's HP / Shuckle's Def) —
 // used purely to scale bar width consistently, not a claim about the true ceiling.
 const MAX_BASE_STAT = 255
+// Highest realistic base stat total (e.g. Arceus/Slaking-tier) — same purpose
+// for the Total row's bar, just on its own larger scale.
+const MAX_TOTAL = 780
 
-export function StatBars({ stats }: { stats: PokemonStat[] }) {
+function StatRow({
+  label,
+  value,
+  pct,
+  barColor,
+  bold,
+}: {
+  label: string
+  value: number
+  pct: number
+  barColor?: string
+  bold?: boolean
+}) {
+  return (
+    <div className={styles.row}>
+      <span className={bold ? styles.labelBold : styles.label}>{label}</span>
+      <div className={styles.track}>
+        <div className={styles.fill} style={{ width: `${pct}%`, backgroundColor: barColor }} />
+      </div>
+      <span className={styles.value}>{value}</span>
+    </div>
+  )
+}
+
+export function StatBars({ stats, barColor }: { stats: PokemonStat[]; barColor?: string }) {
   const total = stats.reduce((sum, s) => sum + s.base_stat, 0)
 
   return (
-    <div className="flex flex-col gap-2.5">
-      {stats.map((stat) => {
-        const pct = Math.min(100, (stat.base_stat / MAX_BASE_STAT) * 100)
-        return (
-          <div key={stat.stat.name} className="grid grid-cols-[6rem_2.5rem_1fr] items-center gap-3">
-            <span className="text-sm text-muted-foreground">
-              {STAT_LABELS[stat.stat.name] ?? stat.stat.name}
-            </span>
-            <span className="text-right text-sm font-medium tabular-nums">{stat.base_stat}</span>
-            <div className="h-2 rounded-full bg-muted">
-              <div
-                className="h-2 rounded-full bg-primary"
-                style={{ width: `${pct}%` }}
-              />
-            </div>
-          </div>
-        )
-      })}
-      <div className="grid grid-cols-[6rem_2.5rem_1fr] items-center gap-3 pt-1">
-        <span className="text-sm font-medium">Total</span>
-        <span className="text-right text-sm font-semibold tabular-nums">{total}</span>
-        <span />
+    <div className={styles.list}>
+      {stats.map((stat) => (
+        <StatRow
+          key={stat.stat.name}
+          label={STAT_LABELS[stat.stat.name] ?? stat.stat.name}
+          value={stat.base_stat}
+          pct={Math.min(100, (stat.base_stat / MAX_BASE_STAT) * 100)}
+          barColor={barColor}
+        />
+      ))}
+      <div className={styles.totalRow}>
+        <StatRow
+          label="Total"
+          value={total}
+          pct={Math.min(100, (total / MAX_TOTAL) * 100)}
+          barColor={barColor}
+          bold
+        />
       </div>
     </div>
   )

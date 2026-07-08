@@ -1,0 +1,265 @@
+@use 'styles/mixins' as *;
+
+.loadingWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.loadingHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.loadingHeaderText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.notFound {
+  font-size: 0.875rem;
+  color: var(--destructive);
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--card-gap);
+}
+
+.topGrid,
+.bottomGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--card-gap);
+
+  @include lg {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--card-gap);
+}
+
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--card-gap);
+  overflow: visible;
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--border);
+  background-color: color-mix(in oklch, var(--card), transparent 40%);
+
+  padding: var(--card-padding);
+
+  @include sm {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+}
+
+.heroSpriteWrapper {
+  position: relative;
+  margin-top: -3.5rem;
+  flex-shrink: 0;
+  align-self: center;
+
+  @include sm {
+    align-self: auto;
+  }
+}
+
+.heroGlow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 9999px;
+  opacity: 0.4;
+  filter: blur(24px);
+}
+
+.heroSpriteButton {
+  position: relative;
+  z-index: 10;
+  cursor: zoom-in;
+  transition: transform 0.15s ease;
+  background: none;
+  border: none;
+  padding: 0;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring), transparent 50%);
+    border-radius: 9999px;
+  }
+}
+
+.heroSprite {
+  height: var(--sprite-size-hero);
+  width: var(--sprite-size-hero);
+  object-fit: contain;
+}
+
+.heroInfo {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.heroTitleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.heroTitle {
+  font-size: var(--heading-page-title);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.dexNumber {
+  padding-top: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.badgeRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--border);
+  background-color: color-mix(in oklch, var(--card), transparent 40%);
+  padding: var(--card-padding);
+}
+
+.sectionTitle {
+  font-size: var(--heading-section);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.matchupsIntro {
+  margin-top: -0.375rem;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.evolutionScroll {
+  overflow-x: auto;
+}
+
+// --- Quick-view dialog ---
+
+.quickViewBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+
+.quickViewSpriteWrapper {
+  position: relative;
+  display: flex;
+  height: var(--sprite-size-quickview);
+  width: var(--sprite-size-quickview);
+  align-items: center;
+  justify-content: center;
+}
+
+.quickViewGlow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 9999px;
+  opacity: 0.4;
+  filter: blur(24px);
+}
+
+.quickViewSprite {
+  position: relative;
+  z-index: 10;
+  height: var(--sprite-size-quickview);
+  width: var(--sprite-size-quickview);
+  object-fit: contain;
+}
+
+.quickViewInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  text-align: center;
+}
+
+.quickViewName {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.quickViewGenus {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.quickViewBadges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.375rem;
+  padding-top: 0.25rem;
+}
+
+.quickViewStats {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.statTile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  background-color: color-mix(in oklch, var(--card), transparent 40%);
+  padding: 0.625rem 1rem;
+}
+
+.statTileLabel {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.statTileValue {
+  font-size: 1.125rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}

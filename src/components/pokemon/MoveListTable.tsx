@@ -1,7 +1,12 @@
 import { Link } from 'react-router-dom'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
+import { TypeBadge } from '@/components/pokemon/TypeBadge'
+import { useMove } from '@/lib/queries/useMove'
 import type { PokemonMove } from '@/types/pokeapi'
 import { toDisplayName } from '@/lib/constants/nameOverrides'
+import styles from './MoveListTable.module.scss'
 
 const METHOD_ORDER = ['level-up', 'machine', 'tutor', 'egg']
 const METHOD_LABELS: Record<string, string> = {
@@ -14,6 +19,42 @@ const METHOD_LABELS: Record<string, string> = {
 interface MethodEntry {
   moveName: string
   level: number
+}
+
+function MoveTile({ moveName, level }: { moveName: string; level?: number }) {
+  const { data: move } = useMove(moveName)
+
+  return (
+    <Link to={`/move/${moveName}`} className={styles.tile}>
+      <div className={styles.tileHeader}>
+        <span className={styles.tileName}>{toDisplayName(moveName)}</span>
+        <div className={styles.tileBadges}>
+          {level !== undefined && (
+            <Badge variant="secondary">{level === 0 ? 'Evolve' : `Lv. ${level}`}</Badge>
+          )}
+          {move && <TypeBadge type={move.type.name} />}
+        </div>
+      </div>
+      {move ? (
+        <div className={styles.stats}>
+          <div className={styles.statBlock}>
+            <span className={styles.statLabel}>Power</span>
+            <span>{move.power ?? '—'}</span>
+          </div>
+          <div className={styles.statBlock}>
+            <span className={styles.statLabel}>Accuracy</span>
+            <span>{move.accuracy ? `${move.accuracy}%` : '—'}</span>
+          </div>
+          <div className={styles.statBlockEnd}>
+            <span className={styles.statLabel}>PP</span>
+            <span>{move.pp ?? '—'}</span>
+          </div>
+        </div>
+      ) : (
+        <Skeleton style={{ height: '1rem', width: '10rem' }} />
+      )}
+    </Link>
+  )
 }
 
 export function MoveListTable({
@@ -37,7 +78,7 @@ export function MoveListTable({
   const availableMethods = METHOD_ORDER.filter((m) => byMethod.has(m))
 
   if (availableMethods.length === 0) {
-    return <p className="text-sm text-muted-foreground">No move data for this game version.</p>
+    return <p className={styles.empty}>No move data for this game version.</p>
   }
 
   return (
@@ -58,23 +99,15 @@ export function MoveListTable({
         }
         return (
           <TabsContent key={method} value={method}>
-            <ul className="flex flex-col divide-y">
+            <div className={styles.grid}>
               {entries.map((entry) => (
-                <li
+                <MoveTile
                   key={entry.moveName}
-                  className="flex items-center justify-between py-2 text-sm"
-                >
-                  <Link to={`/move/${entry.moveName}`} className="font-medium hover:underline">
-                    {toDisplayName(entry.moveName)}
-                  </Link>
-                  {method === 'level-up' && (
-                    <span className="tabular-nums text-muted-foreground">
-                      {entry.level === 0 ? 'Evolve' : `Lv. ${entry.level}`}
-                    </span>
-                  )}
-                </li>
+                  moveName={entry.moveName}
+                  level={method === 'level-up' ? entry.level : undefined}
+                />
               ))}
-            </ul>
+            </div>
           </TabsContent>
         )
       })}

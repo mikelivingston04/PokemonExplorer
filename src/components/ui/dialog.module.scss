@@ -1,0 +1,85 @@
+@keyframes overlayIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes contentIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  isolation: isolate;
+  z-index: 50;
+  background: oklch(0 0 0 / 0.1);
+
+  @supports (backdrop-filter: blur(1px)) {
+    backdrop-filter: blur(2px);
+  }
+
+  &[data-open] {
+    animation: overlayIn 0.1s ease-out;
+  }
+}
+
+.content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 50;
+  display: grid;
+  width: 100%;
+  max-width: calc(100% - 2rem);
+  gap: 1rem;
+  transform: translate(-50%, -50%);
+  border-radius: var(--radius-xl);
+  background: var(--popover);
+  padding: 1rem;
+  font-size: 0.875rem;
+  color: var(--popover-foreground);
+  box-shadow: 0 4px 6px -1px oklch(0 0 0 / 0.1);
+  outline: none;
+
+  @media (min-width: 640px) {
+    max-width: 24rem;
+  }
+
+  &[data-open] {
+    animation: contentIn 0.1s ease-out;
+  }
+}
+
+.closeButton {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.title {
+  font-size: 1rem;
+  line-height: 1;
+  font-weight: 500;
+}
+
+.description {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}

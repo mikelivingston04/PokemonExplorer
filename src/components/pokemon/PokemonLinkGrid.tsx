@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { NamedApiResource } from '@/types/pokeapi'
 import { usePokemon } from '@/lib/queries/usePokemon'
+import { useInfiniteReveal } from '@/lib/useInfiniteReveal'
 import { toDisplayName } from '@/lib/constants/nameOverrides'
-import { Button } from '@/components/ui/button'
 import { SpriteImage } from '@/components/pokemon/SpriteImage'
 import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/lib/utils'
+import styles from './PokemonLinkGrid.module.scss'
 
 const PAGE_SIZE = 24
 
@@ -14,65 +15,49 @@ function PokemonLinkTile({ name }: { name: string }) {
   const sprite = pokemon?.sprites.front_default
 
   return (
-    <Link
-      to={`/pokemon/${name}`}
-      className="flex flex-col items-center gap-1 rounded-lg border bg-card/60 p-2 text-center transition-colors hover:border-foreground/20 hover:bg-card"
-    >
+    <Link to={`/pokemon/${name}`} className={styles.tile}>
       {isLoading ? (
-        <Skeleton className="h-10 w-10 rounded-md" />
+        <Skeleton style={{ height: '2.5rem', width: '2.5rem' }} />
       ) : (
-        <SpriteImage src={sprite} alt="" className="h-10 w-10 object-contain" />
+        <SpriteImage src={sprite} alt="" className={styles.sprite} />
       )}
-      <span className="line-clamp-1 text-sm font-medium">{toDisplayName(name)}</span>
+      <span className={styles.name}>{toDisplayName(name)}</span>
     </Link>
   )
 }
 
-export function PokemonLinkGrid({ pokemon }: { pokemon: NamedApiResource[] }) {
-  const [page, setPage] = useState(0)
+interface PokemonLinkGridProps {
+  pokemon: NamedApiResource[]
+  // When set, the grid becomes its own fixed-height scroll pane with
+  // infinite scroll bound to that pane instead of the whole page — for
+  // layouts where sibling content must stay in place while only this grid
+  // scrolls. Omit for normal whole-page infinite scroll.
+  scrollPaneClassName?: string
+}
 
-  useEffect(() => {
-    setPage(0)
-  }, [pokemon])
-
-  const totalPages = Math.ceil(pokemon.length / PAGE_SIZE)
-  const start = page * PAGE_SIZE
-  const visible = pokemon.slice(start, start + PAGE_SIZE)
+export function PokemonLinkGrid({ pokemon, scrollPaneClassName }: PokemonLinkGridProps) {
+  const { visible, scrollRef, sentinelRef, hasMore } = useInfiniteReveal(pokemon, PAGE_SIZE)
 
   if (pokemon.length === 0) {
-    return <p className="text-sm text-muted-foreground">No Pokémon found.</p>
+    return <p className={styles.empty}>No Pokémon found.</p>
   }
 
-  return (
-    <div className="flex flex-col gap-3">
-      <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
+  const content = (
+    <div className={styles.content}>
+      <div className={styles.grid}>
         {visible.map((p) => (
           <PokemonLinkTile key={p.name} name={p.name} />
         ))}
       </div>
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={page === 0}
-            onClick={() => setPage((p) => p - 1)}
-          >
-            Previous
-          </Button>
-          <span className="text-sm text-muted-foreground">
-            Page {page + 1} of {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={page >= totalPages - 1}
-            onClick={() => setPage((p) => p + 1)}
-          >
-            Next
-          </Button>
-        </div>
-      )}
+      {hasMore && <div ref={sentinelRef} aria-hidden className={styles.sentinel} />}
+    </div>
+  )
+
+  if (!scrollPaneClassName) return content
+
+  return (
+    <div ref={scrollRef} className={cn(styles.scrollPane, scrollPaneClassName)}>
+      {content}
     </div>
   )
 }

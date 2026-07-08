@@ -3,6 +3,7 @@ import { TYPE_COLORS, type PokemonType } from '@/lib/constants/typeColors'
 import { toDisplayName } from '@/lib/constants/nameOverrides'
 import { cn } from '@/lib/utils'
 import type { TypeBreakdownEntry } from '@/lib/queries/useCompatibleTypeBreakdown'
+import styles from './TypeCompatibilityList.module.scss'
 
 interface TypeCompatibilityListProps {
   entries: TypeBreakdownEntry[]
@@ -12,7 +13,7 @@ interface TypeCompatibilityListProps {
 
 export function TypeCompatibilityList({ entries, expanded, onToggle }: TypeCompatibilityListProps) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className={styles.list}>
       {entries.map(({ type, pokemon }) => {
         const colors = TYPE_COLORS[type]
         const active = expanded === type
@@ -22,7 +23,7 @@ export function TypeCompatibilityList({ entries, expanded, onToggle }: TypeCompa
             type="button"
             onClick={() => onToggle(type)}
             aria-expanded={active}
-            className="flex items-center justify-between gap-2 rounded-lg border-2 px-3 py-1.5 text-sm font-medium transition-colors"
+            className={styles.pill}
             style={{
               backgroundColor: active ? colors.bg : 'transparent',
               color: active ? colors.fg : colors.bg,
@@ -30,9 +31,9 @@ export function TypeCompatibilityList({ entries, expanded, onToggle }: TypeCompa
             }}
           >
             <span>
-              {toDisplayName(type)} <span className="tabular-nums opacity-80">({pokemon.length})</span>
+              {toDisplayName(type)} <span className={styles.count}>({pokemon.length})</span>
             </span>
-            <ChevronDownIcon className={cn('size-4 shrink-0 transition-transform', active && 'rotate-180')} />
+            <ChevronDownIcon className={cn(styles.chevron, active && styles.chevronOpen)} />
           </button>
         )
       })}

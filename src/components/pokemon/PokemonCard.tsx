@@ -8,6 +8,7 @@ import { TypeBadge } from '@/components/pokemon/TypeBadge'
 import { SpriteImage } from '@/components/pokemon/SpriteImage'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import styles from './PokemonCard.module.scss'
 
 export function PokemonCard({ name }: { name: string }) {
   const { data: pokemon, isLoading } = usePokemon(name)
@@ -17,9 +18,9 @@ export function PokemonCard({ name }: { name: string }) {
 
   if (isLoading || !pokemon) {
     return (
-      <div className="flex h-full flex-col items-center gap-2 rounded-xl border bg-card/60 p-3">
-        <Skeleton className="h-20 w-20 rounded-md" />
-        <Skeleton className="h-4 w-20" />
+      <div className={styles.skeletonCard}>
+        <Skeleton style={{ height: 'var(--sprite-size-grid)', width: 'var(--sprite-size-grid)' }} />
+        <Skeleton style={{ height: '1rem', width: '5rem' }} />
       </div>
     )
   }
@@ -29,24 +30,14 @@ export function PokemonCard({ name }: { name: string }) {
   const glowColor = primaryType && isPokemonType(primaryType) ? TYPE_COLORS[primaryType].bg : undefined
 
   return (
-    <Link
-      to={`/pokemon/${pokemon.name}`}
-      className="group flex h-full flex-col items-center gap-1.5 rounded-xl border bg-card/60 p-3 text-center transition-colors hover:border-foreground/20 hover:bg-card"
-    >
-      <span className="self-start text-xs text-muted-foreground tabular-nums">
-        #{String(pokemon.id).padStart(3, '0')}
-      </span>
-      <div className="relative flex h-20 w-20 items-center justify-center">
-        {glowColor && (
-          <div
-            className="absolute inset-0 -z-0 rounded-full opacity-40 blur-xl transition-opacity group-hover:opacity-60"
-            style={{ backgroundColor: glowColor }}
-          />
-        )}
-        <SpriteImage src={sprite} alt="" className="relative z-10 h-20 w-20 object-contain" />
+    <Link to={`/pokemon/${pokemon.name}`} className={styles.card}>
+      <span className={styles.dexNumber}>#{String(pokemon.id).padStart(3, '0')}</span>
+      <div className={styles.spriteWrapper}>
+        {glowColor && <div className={styles.glow} style={{ backgroundColor: glowColor }} />}
+        <SpriteImage src={sprite} alt="" className={styles.sprite} />
       </div>
-      <span className="line-clamp-1 font-medium">{toDisplayName(pokemon.name)}</span>
-      <div className="flex min-h-[1.375rem] flex-wrap items-center justify-center gap-1">
+      <span className={styles.name}>{toDisplayName(pokemon.name)}</span>
+      <div className={styles.badges}>
         {pokemon.types.map((t) => (
           <TypeBadge key={t.type.name} type={t.type.name} />
         ))}

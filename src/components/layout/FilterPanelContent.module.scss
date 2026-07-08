@@ -1,0 +1,100 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.categoryRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.clearAll {
+  margin-left: auto;
+}
+
+.toggle {
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklch, var(--card), transparent 60%);
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  user-select: none;
+  transition: border-color 0.15s ease;
+
+  &:hover {
+    border-color: color-mix(in oklch, var(--foreground), transparent 80%);
+  }
+}
+
+.toggleLabel {
+  color: var(--foreground);
+  transition: color 0.15s ease;
+}
+
+.toggleLabelActive {
+  color: oklch(0.765 0.177 163.223); // matches the emerald "filter in use" accent
+}
+
+.optionsRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  border-width: 2px;
+  border-style: solid;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.pillNeutral {
+  border-color: var(--border);
+  background: transparent;
+  color: var(--muted-foreground);
+
+  &:hover {
+    border-color: color-mix(in oklch, var(--foreground), transparent 70%);
+    color: var(--foreground);
+  }
+}
+
+.pillActive {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.learnsMoveBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.hint {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.moveComboboxWrapper {
+  width: 14rem;
+}
+
+.methodSelect {
+  width: 10rem;
+}

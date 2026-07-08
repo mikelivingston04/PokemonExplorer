@@ -1,0 +1,24 @@
+.skeletonList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.empty {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+
+  li + li {
+    border-top: 1px solid var(--border);
+  }
+}
+
+.item {
+  padding: 0.5rem 0;
+  font-size: 0.875rem;
+}

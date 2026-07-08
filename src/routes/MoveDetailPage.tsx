@@ -14,6 +14,7 @@ import { PokemonLinkGrid } from '@/components/pokemon/PokemonLinkGrid'
 import { TypeEffectivenessChart } from '@/components/types/TypeEffectivenessChart'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import styles from './MoveDetailPage.module.scss'
 
 const DAMAGE_CLASS_LABELS: Record<string, string> = {
   physical: 'Physical',
@@ -23,9 +24,9 @@ const DAMAGE_CLASS_LABELS: Record<string, string> = {
 
 function StatTile({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col items-center gap-1 rounded-xl border bg-card/60 px-4 py-3">
-      <span className="text-xs text-muted-foreground">{label}</span>
-      <span className="text-2xl font-semibold tabular-nums">{value}</span>
+    <div className={styles.statTile}>
+      <span className={styles.statTileLabel}>{label}</span>
+      <span className={styles.statTileValue}>{value}</span>
     </div>
   )
 }
@@ -40,15 +41,15 @@ export function MoveDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-4">
-        <Skeleton className="h-10 w-48" />
-        <Skeleton className="h-40 w-full" />
+      <div className={styles.loadingWrapper}>
+        <Skeleton style={{ height: '2.5rem', width: '12rem' }} />
+        <Skeleton style={{ height: '10rem', width: '100%' }} />
       </div>
     )
   }
 
   if (isError || !move) {
-    return <p className="text-sm text-destructive">Couldn't find a move named "{name}".</p>
+    return <p className={styles.notFound}>Couldn't find a move named "{name}".</p>
   }
 
   function toggleType(type: PokemonType) {
@@ -61,50 +62,52 @@ export function MoveDetailPage() {
   const visiblePokemon = expandedEntry ? expandedEntry.pokemon : move.learned_by_pokemon
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-5 rounded-2xl border bg-card/60 p-6 lg:flex-row lg:items-start lg:justify-between">
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <h1 className="text-4xl font-semibold tracking-tight">{toDisplayName(move.name)}</h1>
-            <div className="flex flex-wrap items-center gap-1.5">
+    <div className={styles.page}>
+      <div className={styles.hero}>
+        <div className={styles.heroLeft}>
+          <div className={styles.titleBlock}>
+            <h1 className={styles.title}>{toDisplayName(move.name)}</h1>
+            <div className={styles.badgeRow}>
               <TypeBadge type={move.type.name} linkTo />
               <Badge variant="secondary">
                 {DAMAGE_CLASS_LABELS[move.damage_class.name] ?? move.damage_class.name}
               </Badge>
               {tmLoading ? (
-                <Skeleton className="h-5 w-14" />
+                <Skeleton style={{ height: '1.25rem', width: '3.5rem' }} />
               ) : !hasNoMachine ? (
                 <Badge variant="secondary">{tmName?.toUpperCase()}</Badge>
               ) : null}
             </div>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className={styles.statTiles}>
             <StatTile label="Power" value={move.power !== null ? String(move.power) : '—'} />
             <StatTile label="Accuracy" value={move.accuracy !== null ? `${move.accuracy}%` : '—'} />
             <StatTile label="PP" value={move.pp !== null ? String(move.pp) : '—'} />
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 lg:min-w-56">
-          <h2 className="text-sm font-semibold text-muted-foreground">Type Matchups</h2>
+        <div className={styles.matchups}>
+          <h2 className={styles.matchupsTitle}>Type Matchups</h2>
+          <p className={styles.matchupsIntro}>How much damage this move deals to each defending type.</p>
           {moveTypeData ? (
-            <TypeEffectivenessChart multipliers={computeOffensiveEffectiveness(moveTypeData.damage_relations)} />
+            <TypeEffectivenessChart
+              perspective="offense"
+              multipliers={computeOffensiveEffectiveness(moveTypeData.damage_relations)}
+            />
           ) : (
-            <Skeleton className="h-24 w-full" />
+            <Skeleton style={{ height: '6rem', width: '100%' }} />
           )}
         </div>
       </div>
 
-      <div className="flex flex-col gap-3">
-        <h2 className="text-center text-lg font-semibold tracking-tight">
-          Compatible Pokémon ({move.learned_by_pokemon.length})
-        </h2>
+      <div className={styles.compatibleSection}>
+        <h2 className={styles.compatibleTitle}>Compatible Pokémon ({move.learned_by_pokemon.length})</h2>
         {breakdownLoading ? (
-          <Skeleton className="h-64 w-full" />
+          <Skeleton style={{ height: '16rem', width: '100%' }} />
         ) : (
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-[200px_1fr_200px]">
+          <div className={styles.compatibleGrid}>
             <TypeCompatibilityList entries={leftEntries} expanded={expandedType} onToggle={toggleType} />
-            <PokemonLinkGrid pokemon={visiblePokemon} />
+            <PokemonLinkGrid pokemon={visiblePokemon} scrollPaneClassName={styles.compatibleScrollPane} />
             <TypeCompatibilityList entries={rightEntries} expanded={expandedType} onToggle={toggleType} />
           </div>
         )}

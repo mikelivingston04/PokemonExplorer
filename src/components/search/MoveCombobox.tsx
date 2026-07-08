@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { useSearchIndex } from '@/lib/queries/useSearchIndex'
 import { toDisplayName } from '@/lib/constants/nameOverrides'
 import { XIcon, ChevronsUpDownIcon } from 'lucide-react'
+import styles from './MoveCombobox.module.scss'
 
 interface MoveComboboxProps {
   value?: string
@@ -17,17 +18,17 @@ export function MoveCombobox({ value, onChange }: MoveComboboxProps) {
   const moves = entries.filter((e) => e.category === 'move')
 
   return (
-    <div className="flex items-center gap-1">
+    <div className={styles.wrapper}>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
           render={
-            <Button variant="outline" className="w-full justify-between font-normal">
-              <span className="truncate">{value ? toDisplayName(value) : 'Any move...'}</span>
-              <ChevronsUpDownIcon className="size-4 shrink-0 opacity-50" />
+            <Button variant="outline" className={styles.trigger}>
+              <span className={styles.triggerLabel}>{value ? toDisplayName(value) : 'Any move...'}</span>
+              <ChevronsUpDownIcon className={styles.chevron} />
             </Button>
           }
         />
-        <PopoverContent className="w-64 p-0" align="start">
+        <PopoverContent className={styles.content} align="start">
           <Command>
             <CommandInput placeholder="Search moves..." />
             <CommandList>
@@ -52,7 +53,7 @@ export function MoveCombobox({ value, onChange }: MoveComboboxProps) {
       </Popover>
       {value && (
         <Button variant="ghost" size="icon" onClick={() => onChange(undefined)} aria-label="Clear move filter">
-          <XIcon className="size-4" />
+          <XIcon className={styles.clearIcon} />
         </Button>
       )}
     </div>

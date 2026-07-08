@@ -1,0 +1,51 @@
+@use 'styles/mixins' as *;
+
+.card {
+  @include card-link;
+  width: fit-content;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+}
+
+.sprite {
+  height: var(--sprite-size-evolution);
+  width: var(--sprite-size-evolution);
+  object-fit: contain;
+}
+
+.name {
+  font-weight: 600;
+}
+
+.arrow {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  padding: 0 0.25rem;
+  color: var(--muted-foreground);
+}
+
+.arrowIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.condition {
+  max-width: 6rem;
+  text-align: center;
+  font-size: 0.75rem;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.5rem;
+}

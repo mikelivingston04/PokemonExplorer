@@ -6,6 +6,7 @@ import { useExpensiveFilteredPokemon } from '@/lib/queries/useExpensiveFilteredP
 import { FilterPanelContent } from '@/components/layout/FilterPanelContent'
 import { PokemonGrid } from '@/components/pokemon/PokemonGrid'
 import type { FilterState } from '@/lib/filterEngine/types'
+import styles from './HomePage.module.scss'
 
 export function HomePage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -38,14 +39,7 @@ export function HomePage() {
   }
 
   return (
-    <div className="flex flex-col gap-5">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Search &amp; Filter</h1>
-        <p className="text-sm text-muted-foreground">
-          Find Pokémon, moves, TMs, and types.
-        </p>
-      </div>
-
+    <div className={styles.page}>
       <FilterPanelContent filters={filters} onChange={updateFilters} />
 
       <PokemonGrid names={names} isLoading={isLoading} checkingStatus={checkingStatus} />
