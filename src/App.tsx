@@ -11,7 +11,7 @@ import { TypeDetailPage } from '@/routes/TypeDetailPage'
 function App() {
   return (
     <PersistQueryClientProvider client={queryClient} persistOptions={persistOptions}>
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
         <Routes>
           <Route element={<AppShell />}>
             <Route index element={<HomePage />} />

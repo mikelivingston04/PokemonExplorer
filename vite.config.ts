@@ -3,7 +3,10 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+  // GitHub Pages serves this project from /PokemonExplorer/, not the domain
+  // root — only applied to the production build so local dev still runs at "/".
+  base: command === 'build' ? '/PokemonExplorer/' : '/',
   plugins: [react()],
   resolve: {
     alias: {
@@ -25,4 +28,4 @@ export default defineConfig({
       },
     },
   },
-})
+}))
