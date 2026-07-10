@@ -1,4 +1,6 @@
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -6,7 +8,10 @@ import { TypeBadge } from '@/components/pokemon/TypeBadge'
 import { useMove } from '@/lib/queries/useMove'
 import type { PokemonMove } from '@/types/pokeapi'
 import { toDisplayName } from '@/lib/constants/nameOverrides'
+import { cn } from '@/lib/utils'
 import styles from './MoveListTable.module.scss'
+
+const PAGE_SIZE = 4
 
 const METHOD_ORDER = ['level-up', 'machine', 'tutor', 'egg']
 const METHOD_LABELS: Record<string, string> = {
@@ -57,6 +62,87 @@ function MoveTile({ moveName, level }: { moveName: string; level?: number }) {
   )
 }
 
+function PaginatedMoveGrid({ entries, showLevel }: { entries: MethodEntry[]; showLevel: boolean }) {
+  const pages = useMemo(() => {
+    const chunks: MethodEntry[][] = []
+    for (let i = 0; i < entries.length; i += PAGE_SIZE) chunks.push(entries.slice(i, i + PAGE_SIZE))
+    return chunks
+  }, [entries])
+
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [activePage, setActivePage] = useState(0)
+
+  // Switching method tabs swaps `entries` entirely — jump back to page 1
+  // rather than stranding the view on a page index that may not exist.
+  useEffect(() => {
+    setActivePage(0)
+    scrollRef.current?.scrollTo({ left: 0 })
+  }, [entries])
+
+  function goToPage(index: number) {
+    const el = scrollRef.current
+    if (!el) return
+    el.scrollTo({ left: index * el.clientWidth, behavior: 'smooth' })
+  }
+
+  function handleScroll() {
+    const el = scrollRef.current
+    if (!el || el.clientWidth === 0) return
+    setActivePage(Math.round(el.scrollLeft / el.clientWidth))
+  }
+
+  if (pages.length === 0) return null
+
+  return (
+    <div className={styles.carousel}>
+      <div className={styles.scrollArea} ref={scrollRef} onScroll={handleScroll}>
+        {pages.map((page, i) => (
+          <div key={i} className={styles.page}>
+            {page.map((entry) => (
+              <MoveTile key={entry.moveName} moveName={entry.moveName} level={showLevel ? entry.level : undefined} />
+            ))}
+          </div>
+        ))}
+      </div>
+
+      {pages.length > 1 && (
+        <div className={styles.controls}>
+          <button
+            type="button"
+            onClick={() => goToPage(activePage - 1)}
+            disabled={activePage === 0}
+            aria-label="Previous page of moves"
+            className={styles.arrow}
+          >
+            <ChevronLeftIcon />
+          </button>
+          <div className={styles.dots}>
+            {pages.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => goToPage(i)}
+                aria-label={`Go to move page ${i + 1}`}
+                aria-current={i === activePage}
+                className={cn(styles.dot, i === activePage && styles.dotActive)}
+              />
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => goToPage(activePage + 1)}
+            disabled={activePage === pages.length - 1}
+            aria-label="Next page of moves"
+            className={styles.arrow}
+          >
+            <ChevronRightIcon />
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function MoveListTable({
   moves,
   versionGroup,
@@ -99,15 +185,7 @@ export function MoveListTable({
         }
         return (
           <TabsContent key={method} value={method}>
-            <div className={styles.grid}>
-              {entries.map((entry) => (
-                <MoveTile
-                  key={entry.moveName}
-                  moveName={entry.moveName}
-                  level={method === 'level-up' ? entry.level : undefined}
-                />
-              ))}
-            </div>
+            <PaginatedMoveGrid entries={entries} showLevel={method === 'level-up'} />
           </TabsContent>
         )
       })}

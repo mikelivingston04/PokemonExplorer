@@ -1,12 +1,10 @@
 import { useMemo } from 'react'
 import { useQueries } from '@tanstack/react-query'
-import { getPokemonSpecies } from '@/lib/api/species'
-import { getEvolutionChain } from '@/lib/api/evolutionChain'
 import { getPokemon } from '@/lib/api/pokemon'
-import { extractIdFromUrl, PokeApiError } from '@/lib/api/client'
+import { PokeApiError } from '@/lib/api/client'
 import { expensiveFetchLimiter } from '@/lib/filterEngine/concurrencyLimiter'
 import { isLegendaryOrMythical } from '@/lib/constants/legendaries'
-import { findEvolutionStage } from '@/lib/evolution/findStage'
+import { useEvolutionStageIndex } from '@/lib/queries/useEvolutionStageIndex'
 import type { FilterState } from '@/lib/filterEngine/types'
 
 const LARGE_CANDIDATE_THRESHOLD = 150
@@ -43,54 +41,10 @@ export function useExpensiveFilteredPokemon(
     })
   }, [tier1Names, needsLegendaryCheck, filters.legendaryStatus])
 
-  // Evolution stage: species -> evolution_chain id -> chain, each step
-  // throttled. A candidate whose name isn't a real species (a small number of
-  // alt-forms slip through when no generation filter narrows them out first)
-  // 404s fast and is simply excluded rather than crashing the page.
-  const speciesQueries = useQueries({
-    queries: needsStageCheck
-      ? afterLegendary.map((name) => ({
-          queryKey: ['pokemonSpecies', name],
-          queryFn: () => expensiveFetchLimiter(() => getPokemonSpecies(name)),
-          staleTime: Infinity,
-          retry: false,
-        }))
-      : [],
-  })
-
-  const chainIds = useMemo(() => {
-    if (!needsStageCheck) return []
-    const ids = new Set<number>()
-    for (const q of speciesQueries) {
-      if (q.data) ids.add(extractIdFromUrl(q.data.evolution_chain.url))
-    }
-    return [...ids]
-  }, [speciesQueries, needsStageCheck])
-
-  const chainQueries = useQueries({
-    queries: chainIds.map((id) => ({
-      queryKey: ['evolutionChain', id],
-      queryFn: () => expensiveFetchLimiter(() => getEvolutionChain(id)),
-      staleTime: Infinity,
-    })),
-  })
-
-  const stageBySpecies = useMemo(() => {
-    const map = new Map<string, string>()
-    if (!needsStageCheck) return map
-    const chainById = new Map(chainIds.map((id, i) => [id, chainQueries[i]]))
-    for (const q of speciesQueries) {
-      if (!q.data) continue
-      const chainQuery = chainById.get(extractIdFromUrl(q.data.evolution_chain.url))
-      if (!chainQuery?.data) continue
-      const stage = findEvolutionStage(chainQuery.data.chain, q.data.name)
-      if (stage) map.set(q.data.name, stage)
-    }
-    return map
-  }, [speciesQueries, chainQueries, chainIds, needsStageCheck])
-
-  const stageResolved = !needsStageCheck || speciesQueries.every((q) => q.isSuccess || q.isError)
-  const chainsResolved = chainQueries.every((q) => q.isSuccess || q.isError)
+  // Evolution stage is looked up from a shared, app-wide index built once
+  // from every evolution chain in the game (~540 total, static data) rather
+  // than per-candidate — see useEvolutionStageIndex for why.
+  const { stageBySpecies, isResolved: stageResolved } = useEvolutionStageIndex(needsStageCheck)
 
   const afterStage = useMemo(() => {
     if (!needsStageCheck) return afterLegendary
@@ -131,8 +85,7 @@ export function useExpensiveFilteredPokemon(
     return afterStage.filter((name) => passing.has(name))
   }, [afterStage, pokemonQueries, needsMethodCheck, filters.learnsMove, filters.versionGroup, filters.learnMethod])
 
-  const isChecking =
-    (needsStageCheck && (!stageResolved || !chainsResolved)) || (needsMethodCheck && !methodResolved)
+  const isChecking = (needsStageCheck && !stageResolved) || (needsMethodCheck && !methodResolved)
 
   return {
     names: afterMethod,

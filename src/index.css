@@ -127,6 +127,8 @@ textarea,
 select {
     font: inherit;
     color: inherit;
+    background: transparent;
+    border: none;
 }
 
 .dark body {

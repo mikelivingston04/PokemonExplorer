@@ -60,13 +60,13 @@
 
   @include sm {
     flex-direction: row;
-    align-items: flex-end;
+    align-items: center;
   }
 }
 
 .heroSpriteWrapper {
   position: relative;
-  margin-top: -3.5rem;
+  // margin-top: -3.5rem;
   flex-shrink: 0;
   align-self: center;
 

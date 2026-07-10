@@ -11,6 +11,7 @@
   gap: 0.5rem;
   padding: 1rem;
   text-align: left;
+  max-height: 110px;
 }
 
 .tileHeader {
@@ -58,12 +59,89 @@
   color: var(--foreground);
 }
 
-.grid {
+.carousel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.scrollArea {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.page {
+  flex: 0 0 100%;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 0.75rem;
+  scroll-snap-align: start;
 
   @include sm {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.875rem;
+}
+
+.arrow {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  color: var(--muted-foreground);
+  transition: color 0.15s ease, border-color 0.15s ease;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &:hover:not(:disabled) {
+    color: var(--foreground);
+    border-color: color-mix(in oklch, var(--foreground), transparent 70%);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+.dots {
+  display: flex;
+  align-items: center;
+  gap: 0.4375rem;
+}
+
+.dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--border);
+  transition: background-color 0.15s ease, transform 0.15s ease;
+
+  &:hover {
+    background: color-mix(in oklch, var(--foreground), transparent 60%);
+  }
+}
+
+.dotActive {
+  background: var(--foreground);
+  transform: scale(1.3);
 }

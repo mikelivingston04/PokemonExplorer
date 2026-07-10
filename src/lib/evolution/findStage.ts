@@ -1,18 +1,16 @@
 import type { ChainLink } from '@/types/pokeapi'
 import type { EvolutionStage } from '@/lib/filterEngine/types'
 
-export function findEvolutionStage(chain: ChainLink, speciesName: string): EvolutionStage | undefined {
-  function walk(node: ChainLink, depth: number): EvolutionStage | undefined {
-    if (node.species.name === speciesName) {
-      if (depth === 0) return 'basic'
-      if (depth === 1) return 'stage1'
-      return 'stage2' // depth 2+ — no mainline chain goes deeper
-    }
-    for (const child of node.evolves_to) {
-      const found = walk(child, depth + 1)
-      if (found) return found
-    }
-    return undefined
+// One chain response already contains every species in that family — walking
+// it once yields stages for all of them, rather than needing a separate
+// per-species lookup (which also 404s for alt-forms that share a base
+// species' chain but aren't a species of their own, like "charizard-mega-x").
+export function collectEvolutionStages(chain: ChainLink): Map<string, EvolutionStage> {
+  const stages = new Map<string, EvolutionStage>()
+  function walk(node: ChainLink, depth: number) {
+    stages.set(node.species.name, depth === 0 ? 'basic' : depth === 1 ? 'stage1' : 'stage2')
+    node.evolves_to.forEach((child) => walk(child, depth + 1))
   }
-  return walk(chain, 0)
+  walk(chain, 0)
+  return stages
 }

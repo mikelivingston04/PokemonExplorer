@@ -26,11 +26,24 @@ export const persister = createSyncStoragePersister({
   key: 'pokemon-explorer-cache',
 })
 
+// 'pokemonSpecies' is only fetched one-off per Pokémon's own detail page
+// (for its Evolution Chain card) — cheap to refetch on revisit, so it's not
+// worth persisting. 'evolutionChain' used to be excluded too, back when the
+// Evolution Stage filter fetched species+chain per candidate (up to the
+// whole ~1300-Pokémon roster at once); that made every throttled localStorage
+// write — which fires roughly once a second while a scan is in flight —
+// synchronously JSON.stringify a multi-megabyte payload, freezing the page.
+// Evolution stage is now looked up from a shared ~540-chain index built once
+// (see useEvolutionStageIndex), so 'evolutionChain' data is small and bounded
+// — it's worth persisting now, so that index only has to be fetched once ever.
+const NOT_PERSISTED_QUERY_KEYS = new Set(['pokemonSpecies'])
+
 export const persistOptions = {
   persister,
   maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
   buster: 'v1', // bump to invalidate all persisted cache after a data-shape change
   dehydrateOptions: {
-    shouldDehydrateQuery: (query: Query) => query.state.status === 'success',
+    shouldDehydrateQuery: (query: Query) =>
+      query.state.status === 'success' && !NOT_PERSISTED_QUERY_KEYS.has(query.queryKey[0] as string),
   },
 }

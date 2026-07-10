@@ -11,14 +11,17 @@
 }
 
 .dialogContent {
-  top: 6%;
-  max-height: 88vh;
+  // See the comment on .content in dialog.module.scss — these feed the
+  // shared dialog's own top/transform/size rules rather than redeclaring
+  // those properties directly, so this can't lose a stylesheet-order race.
+  --dialog-top: 6%;
+  --dialog-transform: translateX(-50%);
+  --dialog-max-height: 88vh;
+  --dialog-padding: 5px;
   overflow: hidden;
-  border-radius: var(--radius-xl);
-  padding: 0;
 
   @media (min-width: 640px) {
-    max-width: 56rem;
+    --dialog-max-width-sm: 56rem;
   }
 }
 
@@ -112,6 +115,12 @@
   &[data-selected] {
     background: var(--muted);
     color: var(--foreground);
+
+    &:hover {
+      cursor: pointer;
+      border-color: color-mix(in oklch, var(--foreground), transparent 70%);
+      color: var(--foreground);
+    }
   }
 }
 

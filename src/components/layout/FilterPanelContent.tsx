@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
+import { ChevronDownIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { MoveCombobox } from '@/components/search/MoveCombobox'
 import { TYPE_COLORS, ALL_TYPE_NAMES } from '@/lib/constants/typeColors'
 import { toDisplayName } from '@/lib/constants/nameOverrides'
-import { DEFAULT_FILTER_STATE, isFilterActive, type FilterState } from '@/lib/filterEngine/types'
+import type { FilterState } from '@/lib/filterEngine/types'
 import { cn } from '@/lib/utils'
 import styles from './FilterPanelContent.module.scss'
 
@@ -50,6 +52,11 @@ function categoryHasValue(key: CategoryKey, filters: FilterState): boolean {
 interface FilterPanelContentProps {
   filters: FilterState
   onChange: (next: FilterState) => void
+  // "Clear all" also needs to drop any active search text and jump back
+  // home — both live outside this component, so the caller owns the action.
+  // Always rendered (not gated on whether anything's active) since it
+  // doubles as a home button on every page, including detail pages.
+  onClearAll: () => void
 }
 
 function CategoryToggle({
@@ -95,7 +102,143 @@ function Pill({
   )
 }
 
-export function FilterPanelContent({ filters, onChange }: FilterPanelContentProps) {
+// The options content for a single category — shared between the desktop
+// inline-expand row and the mobile popover, so the two surfaces can't drift.
+function CategoryOptions({
+  categoryKey,
+  filters,
+  onChange,
+}: {
+  categoryKey: CategoryKey
+  filters: FilterState
+  onChange: (next: FilterState) => void
+}) {
+  switch (categoryKey) {
+    case 'generation':
+      return (
+        <div className={styles.optionsRow}>
+          {GENERATIONS.map((gen) => {
+            const active = filters.generations.includes(gen)
+            return (
+              <Pill
+                key={gen}
+                active={active}
+                onClick={() =>
+                  onChange({
+                    ...filters,
+                    generations: active
+                      ? filters.generations.filter((g) => g !== gen)
+                      : [...filters.generations, gen],
+                  })
+                }
+              >
+                {gen}
+              </Pill>
+            )
+          })}
+        </div>
+      )
+
+    case 'type':
+      return (
+        <div className={styles.optionsRow}>
+          {ALL_TYPE_NAMES.map((type) => {
+            const active = filters.types.includes(type)
+            const colors = TYPE_COLORS[type]
+            return (
+              <Pill
+                key={type}
+                active={active}
+                onClick={() =>
+                  onChange({
+                    ...filters,
+                    types: active ? filters.types.filter((t) => t !== type) : [...filters.types, type],
+                  })
+                }
+                style={{
+                  backgroundColor: active ? colors.bg : 'transparent',
+                  color: active ? colors.fg : colors.bg,
+                  borderColor: colors.bg,
+                }}
+              >
+                {toDisplayName(type)}
+              </Pill>
+            )
+          })}
+        </div>
+      )
+
+    case 'learnsMove':
+      return (
+        <div className={styles.learnsMoveBlock}>
+          <p className={styles.hint}>Pick a specific move, a learn method, or both together.</p>
+          <div className={styles.optionsRow}>
+            <div className={styles.moveComboboxWrapper}>
+              <MoveCombobox
+                value={filters.learnsMove}
+                onChange={(move) => onChange({ ...filters, learnsMove: move })}
+              />
+            </div>
+            <Select
+              items={LEARN_METHOD_LABELS}
+              value={filters.learnMethod}
+              onValueChange={(value) => onChange({ ...filters, learnMethod: value as FilterState['learnMethod'] })}
+            >
+              <SelectTrigger className={styles.methodSelect}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="any">Any method</SelectItem>
+                <SelectItem value="level-up">Level-up</SelectItem>
+                <SelectItem value="machine">TM / HM</SelectItem>
+                <SelectItem value="tutor">Tutor</SelectItem>
+                <SelectItem value="egg">Egg</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      )
+
+    case 'legendary':
+      return (
+        <div className={styles.optionsRow}>
+          {(['legendary', 'non-legendary'] as const).map((status) => {
+            const active = filters.legendaryStatus === status
+            return (
+              <Pill
+                key={status}
+                active={active}
+                onClick={() => onChange({ ...filters, legendaryStatus: active ? 'any' : status })}
+              >
+                {status === 'legendary' ? 'Legendary / Mythical' : 'Non-legendary'}
+              </Pill>
+            )
+          })}
+        </div>
+      )
+
+    case 'evolution':
+      return (
+        <div className={styles.optionsRow}>
+          {(['basic', 'stage1', 'stage2'] as const).map((stage) => {
+            const active = filters.evolutionStage === stage
+            const label = stage === 'basic' ? 'Basic' : stage === 'stage1' ? 'Stage 1' : 'Stage 2'
+            return (
+              <Pill
+                key={stage}
+                active={active}
+                onClick={() => onChange({ ...filters, evolutionStage: active ? 'any' : stage })}
+              >
+                {label}
+              </Pill>
+            )
+          })}
+        </div>
+      )
+  }
+}
+
+export function FilterPanelContent({ filters, onChange, onClearAll }: FilterPanelContentProps) {
   const [expanded, setExpanded] = useState<Set<CategoryKey>>(
     () => new Set(CATEGORIES.filter((c) => categoryHasValue(c.key, filters)).map((c) => c.key)),
   )
@@ -127,8 +270,18 @@ export function FilterPanelContent({ filters, onChange }: FilterPanelContentProp
     })
   }
 
+  // Expand/collapse is otherwise deliberately independent of filter values,
+  // but "Clear all" is meant to reset everything back to the untouched
+  // starting state — including collapsing every toggle row.
+  function handleClearAll() {
+    setExpanded(new Set())
+    onClearAll()
+  }
+
   return (
     <div className={styles.panel}>
+      {/* Desktop: a Switch per category expands an inline options row below —
+          there's enough width that stacking rows doesn't cost much space. */}
       <div className={styles.categoryRow}>
         {CATEGORIES.map((c) => (
           <CategoryToggle
@@ -139,129 +292,38 @@ export function FilterPanelContent({ filters, onChange }: FilterPanelContentProp
             onToggle={() => toggleCategory(c.key)}
           />
         ))}
-        {isFilterActive(filters) && (
-          <Button variant="ghost" size="sm" className={styles.clearAll} onClick={() => onChange(DEFAULT_FILTER_STATE)}>
-            Clear all
-          </Button>
+        <Button variant="ghost" size="sm" className={styles.clearAll} onClick={handleClearAll}>
+          Clear all
+        </Button>
+      </div>
+
+      <div className={styles.desktopOptions}>
+        {CATEGORIES.map(
+          (c) => expanded.has(c.key) && <CategoryOptions key={c.key} categoryKey={c.key} filters={filters} onChange={onChange} />,
         )}
       </div>
 
-      {expanded.has('generation') && (
-        <div className={styles.optionsRow}>
-          {GENERATIONS.map((gen) => {
-            const active = filters.generations.includes(gen)
-            return (
-              <Pill
-                key={gen}
-                active={active}
-                onClick={() =>
-                  onChange({
-                    ...filters,
-                    generations: active
-                      ? filters.generations.filter((g) => g !== gen)
-                      : [...filters.generations, gen],
-                  })
-                }
-              >
-                {gen}
-              </Pill>
-            )
-          })}
-        </div>
-      )}
-
-      {expanded.has('type') && (
-        <div className={styles.optionsRow}>
-          {ALL_TYPE_NAMES.map((type) => {
-            const active = filters.types.includes(type)
-            const colors = TYPE_COLORS[type]
-            return (
-              <Pill
-                key={type}
-                active={active}
-                onClick={() =>
-                  onChange({
-                    ...filters,
-                    types: active ? filters.types.filter((t) => t !== type) : [...filters.types, type],
-                  })
-                }
-                style={{
-                  backgroundColor: active ? colors.bg : 'transparent',
-                  color: active ? colors.fg : colors.bg,
-                  borderColor: colors.bg,
-                }}
-              >
-                {toDisplayName(type)}
-              </Pill>
-            )
-          })}
-        </div>
-      )}
-
-      {expanded.has('learnsMove') && (
-        <div className={styles.learnsMoveBlock}>
-          <p className={styles.hint}>Pick a specific move, a learn method, or both together.</p>
-          <div className={styles.optionsRow}>
-            <div className={styles.moveComboboxWrapper}>
-              <MoveCombobox
-                value={filters.learnsMove}
-                onChange={(move) => onChange({ ...filters, learnsMove: move })}
-              />
-            </div>
-            <Select
-              items={LEARN_METHOD_LABELS}
-              value={filters.learnMethod}
-              onValueChange={(value) => onChange({ ...filters, learnMethod: value as FilterState['learnMethod'] })}
+      {/* Mobile: an inline row would grow taller every time a category is
+          picked (5 toggles, each adding a wrapped options row of its own) —
+          a popover per category keeps the box's height constant instead. */}
+      <div className={styles.mobileCategoryRow}>
+        {CATEGORIES.map((c) => (
+          <Popover key={c.key}>
+            <PopoverTrigger
+              className={cn(styles.mobileTrigger, categoryHasValue(c.key, filters) && styles.mobileTriggerActive)}
             >
-              <SelectTrigger className={styles.methodSelect}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="any">Any method</SelectItem>
-                <SelectItem value="level-up">Level-up</SelectItem>
-                <SelectItem value="machine">TM / HM</SelectItem>
-                <SelectItem value="tutor">Tutor</SelectItem>
-                <SelectItem value="egg">Egg</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      )}
-
-      {expanded.has('legendary') && (
-        <div className={styles.optionsRow}>
-          {(['legendary', 'non-legendary'] as const).map((status) => {
-            const active = filters.legendaryStatus === status
-            return (
-              <Pill
-                key={status}
-                active={active}
-                onClick={() => onChange({ ...filters, legendaryStatus: active ? 'any' : status })}
-              >
-                {status === 'legendary' ? 'Legendary / Mythical' : 'Non-legendary'}
-              </Pill>
-            )
-          })}
-        </div>
-      )}
-
-      {expanded.has('evolution') && (
-        <div className={styles.optionsRow}>
-          {(['basic', 'stage1', 'stage2'] as const).map((stage) => {
-            const active = filters.evolutionStage === stage
-            const label = stage === 'basic' ? 'Basic' : stage === 'stage1' ? 'Stage 1' : 'Stage 2'
-            return (
-              <Pill
-                key={stage}
-                active={active}
-                onClick={() => onChange({ ...filters, evolutionStage: active ? 'any' : stage })}
-              >
-                {label}
-              </Pill>
-            )
-          })}
-        </div>
-      )}
+              {c.label}
+              <ChevronDownIcon className={styles.mobileTriggerIcon} />
+            </PopoverTrigger>
+            <PopoverContent align="start" className={styles.mobilePopoverContent}>
+              <CategoryOptions categoryKey={c.key} filters={filters} onChange={onChange} />
+            </PopoverContent>
+          </Popover>
+        ))}
+        <Button variant="ghost" size="sm" className={styles.clearAll} onClick={handleClearAll}>
+          Clear all
+        </Button>
+      </div>
     </div>
   )
 }

@@ -1,0 +1,88 @@
+@use 'styles/mixins' as *;
+
+.panel {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.rowLabel {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.tileWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  // Fit-content tiles left-aligned in a wrapping row read as "offset" at
+  // mobile widths — full-width, stacked rows read as a proper list instead.
+  @include sm {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+.tile {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.625rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: color-mix(in oklch, var(--card), transparent 40%);
+  padding: 0.5rem 0.625rem;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+
+  @include sm {
+    width: fit-content;
+  }
+
+  &:hover {
+    border-color: color-mix(in oklch, var(--foreground), transparent 75%);
+    background: var(--card);
+  }
+}
+
+.expandBtn {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--border);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  transition: color 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+
+  @include sm {
+    width: fit-content;
+    height: 100%;
+    justify-content: flex-start;
+  }
+
+  &:hover {
+    border-color: color-mix(in oklch, var(--foreground), transparent 70%);
+    color: var(--foreground);
+  }
+}
+
+.empty {
+  padding: 2rem 0;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}

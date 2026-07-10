@@ -1,0 +1,44 @@
+.card {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 1.25rem;
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--border);
+  background: color-mix(in oklch, var(--card), transparent 20%);
+  padding: 1.25rem 1.75rem;
+  box-shadow: 0 20px 60px -20px oklch(0 0 0 / 0.5);
+}
+
+.searchRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchInput {
+  width: 100%;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklch, var(--input), transparent 40%);
+  padding: 0.875rem 3rem 0.875rem 1.25rem;
+  font-size: 1rem;
+
+  &::placeholder {
+    color: var(--muted-foreground);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring), transparent 50%);
+  }
+}
+
+.searchIcon {
+  position: absolute;
+  right: 1.125rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--muted-foreground);
+  pointer-events: none;
+}
