@@ -1,0 +1,57 @@
+@use 'styles/mixins' as *;
+
+$card-width: 6.5rem;
+
+.row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.card {
+  @include card-link;
+  width: $card-width;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 0.75rem;
+}
+
+// This app is themed around FireRed — call out the one game it's actually
+// modeled on wherever the timeline passes through it.
+.cardFireRed {
+  border-color: var(--primary);
+  background: color-mix(in oklch, var(--primary), transparent 90%);
+}
+
+.sprite {
+  height: 4.5rem;
+  width: 4.5rem;
+  object-fit: contain;
+  // These are literal old in-game sprites, often as small as 56x56 —
+  // pixelated upscaling keeps them crisp instead of going blurry, which
+  // also just reads as more "authentically retro" for the older ones.
+  image-rendering: pixelated;
+}
+
+.labels {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  text-align: center;
+}
+
+.generationLabel {
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.versionLabel {
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  color: var(--muted-foreground);
+}

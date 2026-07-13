@@ -41,6 +41,10 @@ export interface PokemonSprites {
       front_default: string | null
     }
   }
+  // Keyed by generation (e.g. "generation-iii"), then by version group
+  // (e.g. "firered-leafgreen") — the literal in-game sprite for that
+  // release. Already present on every fetched Pokémon; just wasn't typed.
+  versions?: Record<string, Record<string, { front_default: string | null }>>
 }
 
 export interface Pokemon {

@@ -12,6 +12,10 @@
 .list {
   display: flex;
   flex-direction: column;
+  // Some Pokémon (Gyarados, looking at you) turn up in dozens of areas —
+  // cap the card's height and let the list itself scroll instead.
+  max-height: 22rem;
+  overflow-y: auto;
 
   li + li {
     border-top: 1px solid var(--border);

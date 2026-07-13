@@ -16,6 +16,7 @@ import { TypeBadge } from '@/components/pokemon/TypeBadge'
 import { SpriteImage } from '@/components/pokemon/SpriteImage'
 import { StatBars } from '@/components/pokemon/StatBars'
 import { EvolutionChainView } from '@/components/pokemon/EvolutionChainView'
+import { SpriteTimeline } from '@/components/pokemon/SpriteTimeline'
 import { MoveListTable } from '@/components/pokemon/MoveListTable'
 import { TypeEffectivenessChart } from '@/components/types/TypeEffectivenessChart'
 import { LocationsList } from '@/components/pokemon/LocationsList'
@@ -163,6 +164,10 @@ export function PokemonDetailPage() {
           ) : (
             <Skeleton style={{ height: '6rem', width: '100%' }} />
           )}
+        </SectionCard>
+
+        <SectionCard title="Sprite Timeline">
+          <SpriteTimeline sprites={pokemon.sprites} debutGeneration={species?.generation.name} />
         </SectionCard>
 
         <SectionCard title="Locations">
