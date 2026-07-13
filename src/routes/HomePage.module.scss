@@ -1,0 +1,21 @@
+@use 'styles/mixins' as *;
+
+.empty {
+  display: flex;
+  margin-top: 50px;
+  // min-height: 60vh;
+  align-items: center;
+  justify-content: center;
+}
+
+.emptyIcon {
+  width: min(65vw, 24rem);
+  height: min(65vw, 24rem);
+  color: var(--muted-foreground);
+  opacity: 0.25;
+
+  @include lg {
+    width: 32rem;
+    height: 32rem;
+  }
+}

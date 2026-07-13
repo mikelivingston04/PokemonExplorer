@@ -63,6 +63,7 @@ export interface PokemonSpecies {
   generation: NamedApiResource
   evolution_chain: { url: string }
   genera: { genus: string; language: NamedApiResource }[]
+  flavor_text_entries: { flavor_text: string; language: NamedApiResource; version: NamedApiResource }[]
 }
 
 export interface EvolutionDetail {
@@ -131,6 +132,7 @@ export interface Move {
   machines: MoveMachineRef[]
   generation: NamedApiResource
   learned_by_pokemon: NamedApiResource[]
+  flavor_text_entries: { flavor_text: string; language: NamedApiResource; version_group: NamedApiResource }[]
 }
 
 export interface Machine {

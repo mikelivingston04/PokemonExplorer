@@ -29,21 +29,20 @@
   gap: var(--card-gap);
 }
 
-.topGrid,
-.bottomGrid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--card-gap);
+// A real masonry flow, not a grid: CSS Grid (and flex) items in the same
+// row/column stretch or align to their row-mates, which is exactly what
+// produced the dead space above Type Matchups when Locations' row-mate
+// (Moves) ran long. CSS multi-column layout instead fills column 1 top to
+// bottom until it's roughly balanced with column 2, then continues there —
+// each card only ever takes the space its own content needs, and reordering
+// sections in PokemonDetailPage.tsx is all it takes to change the flow.
+.sections {
+  column-count: 1;
+  column-gap: var(--card-gap);
 
   @include lg {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-count: 2;
   }
-}
-
-.column {
-  display: flex;
-  flex-direction: column;
-  gap: var(--card-gap);
 }
 
 .hero {
@@ -55,8 +54,11 @@
   border-radius: var(--radius-2xl);
   border: 1px solid var(--border);
   background-color: color-mix(in oklch, var(--card), transparent 40%);
-
   padding: var(--card-padding);
+  // Same masonry participation as .section — first in DOM order, so this
+  // always lands at the top of the first column.
+  margin-bottom: var(--card-gap);
+  break-inside: avoid;
 
   @include sm {
     flex-direction: row;
@@ -146,25 +148,15 @@
   gap: 0.375rem;
 }
 
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  border-radius: var(--radius-2xl);
-  border: 1px solid var(--border);
-  background-color: color-mix(in oklch, var(--card), transparent 40%);
-  padding: var(--card-padding);
-}
-
-.sectionTitle {
-  font-size: var(--heading-section);
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
 .matchupsIntro {
   margin-top: -0.375rem;
   font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.description {
+  font-size: 0.9375rem;
+  line-height: 1.5;
   color: var(--muted-foreground);
 }
 

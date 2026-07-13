@@ -1,8 +1,14 @@
 @use 'styles/mixins' as *;
 
+// Fixed (not fit-content) so every card in a branching chain like Eevee's
+// is identical regardless of sprite/name — a short name doesn't shrink its
+// card, a long one doesn't grow it.
+$card-width: 7.5rem;
+$arrow-width: 5.5rem;
+
 .card {
   @include card-link;
-  width: fit-content;
+  width: $card-width;
   flex-shrink: 0;
   flex-direction: column;
   align-items: center;
@@ -17,7 +23,13 @@
 }
 
 .name {
+  display: flex;
+  min-height: 2.4em;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   font-weight: 600;
+  line-height: 1.2;
 }
 
 .arrow {
@@ -25,7 +37,9 @@
   flex-shrink: 0;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 0.125rem;
+  width: $arrow-width;
   padding: 0 0.25rem;
   color: var(--muted-foreground);
 }
@@ -35,12 +49,53 @@
   height: 1.5rem;
 }
 
+// It's a real <button>: clicking anywhere on the text (not just the
+// "more..." hint) expands it in place; clicking again re-clamps.
 .condition {
-  max-width: 6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 2.6rem;
   text-align: center;
   font-size: 0.75rem;
-  line-height: 1.1;
+
+  &:hover .conditionText {
+    color: var(--foreground);
+  }
+}
+
+.conditionText {
+  // Some conditions (e.g. Glaceon's, which lists a different trigger per
+  // game version) run to several sentences — clamp by default so one long
+  // condition can't blow out that arrow's height and break the row's
+  // uniformity.
+  display: -webkit-box;
+  width: 100%;
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.15;
   text-wrap: balance;
+}
+
+.conditionTextExpanded {
+  display: block;
+  line-clamp: unset;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+
+.conditionMore {
+  // A sibling of .conditionText, not nested inside it — inside the clamped
+  // box it would just get cut off along with the overflowing text.
+  display: block;
+  margin-top: 0.125rem;
+  font-weight: 600;
+  color: var(--foreground);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .row {

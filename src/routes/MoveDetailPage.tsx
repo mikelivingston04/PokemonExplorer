@@ -1,17 +1,20 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useMove } from '@/lib/queries/useMove'
 import { useTmNumber } from '@/lib/queries/useTmNumber'
 import { useType } from '@/lib/queries/useType'
 import { useCompatibleTypeBreakdown } from '@/lib/queries/useCompatibleTypeBreakdown'
 import { computeOffensiveEffectiveness } from '@/lib/typeEffectiveness'
+import { pickFlavorText } from '@/lib/flavorText'
 import { DEFAULT_VERSION_GROUP } from '@/lib/constants/versionGroups'
 import { toDisplayName } from '@/lib/constants/nameOverrides'
 import type { PokemonType } from '@/lib/constants/typeColors'
+import type { NamedApiResource } from '@/types/pokeapi'
 import { TypeBadge } from '@/components/pokemon/TypeBadge'
-import { TypeCompatibilityList } from '@/components/pokemon/TypeCompatibilityList'
+import { TypeFilterDropdown, TypeFilterColumn } from '@/components/pokemon/TypeFilterDropdown'
 import { PokemonLinkGrid } from '@/components/pokemon/PokemonLinkGrid'
 import { TypeEffectivenessChart } from '@/components/types/TypeEffectivenessChart'
+import { SectionCard } from '@/components/layout/SectionCard'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import styles from './MoveDetailPage.module.scss'
@@ -37,7 +40,19 @@ export function MoveDetailPage() {
   const { tmName, isLoading: tmLoading, hasNoMachine } = useTmNumber(name, DEFAULT_VERSION_GROUP)
   const { data: moveTypeData } = useType(move?.type.name)
   const { breakdown, isLoading: breakdownLoading } = useCompatibleTypeBreakdown(move?.learned_by_pokemon ?? [])
-  const [expandedType, setExpandedType] = useState<PokemonType | null>(null)
+  const [selectedTypes, setSelectedTypes] = useState<PokemonType[]>([])
+
+  // Union across selected types (a dual-type Pokémon can appear under both
+  // of its types' entries, so dedupe by name rather than concatenating).
+  const visiblePokemon = useMemo(() => {
+    if (selectedTypes.length === 0) return []
+    const byName = new Map<string, NamedApiResource>()
+    for (const entry of breakdown) {
+      if (!selectedTypes.includes(entry.type)) continue
+      for (const p of entry.pokemon) byName.set(p.name, p)
+    }
+    return [...byName.values()]
+  }, [breakdown, selectedTypes])
 
   if (isLoading) {
     return (
@@ -52,19 +67,15 @@ export function MoveDetailPage() {
     return <p className={styles.notFound}>Couldn't find a move named "{name}".</p>
   }
 
-  function toggleType(type: PokemonType) {
-    setExpandedType((current) => (current === type ? null : type))
-  }
-
-  const leftEntries = breakdown.filter((_, i) => i % 2 === 0)
-  const rightEntries = breakdown.filter((_, i) => i % 2 === 1)
-  const expandedEntry = breakdown.find((e) => e.type === expandedType)
-  const visiblePokemon = expandedEntry ? expandedEntry.pokemon : move.learned_by_pokemon
+  const description = pickFlavorText(move.flavor_text_entries, (e) => e.version_group.name === DEFAULT_VERSION_GROUP)
 
   return (
     <div className={styles.page}>
-      <div className={styles.hero}>
-        <div className={styles.heroLeft}>
+      {/* Same self-sizing, flows-into-whichever-column-has-room approach as
+          the Pokémon detail page — Compatible Pokémon stays outside this,
+          as its own full-width section below (see .compatibleSection). */}
+      <div className={styles.sections}>
+        <div className={styles.moveCard}>
           <div className={styles.titleBlock}>
             <h1 className={styles.title}>{toDisplayName(move.name)}</h1>
             <div className={styles.badgeRow}>
@@ -86,8 +97,13 @@ export function MoveDetailPage() {
           </div>
         </div>
 
-        <div className={styles.matchups}>
-          <h2 className={styles.matchupsTitle}>Type Matchups</h2>
+        {description && (
+          <SectionCard title="Description">
+            <p className={styles.descriptionText}>{description}</p>
+          </SectionCard>
+        )}
+
+        <SectionCard title="Type Matchups">
           <p className={styles.matchupsIntro}>How much damage this move deals to each defending type.</p>
           {moveTypeData ? (
             <TypeEffectivenessChart
@@ -97,20 +113,42 @@ export function MoveDetailPage() {
           ) : (
             <Skeleton style={{ height: '6rem', width: '100%' }} />
           )}
-        </div>
+        </SectionCard>
       </div>
 
       <div className={styles.compatibleSection}>
-        <h2 className={styles.compatibleTitle}>Compatible Pokémon ({move.learned_by_pokemon.length})</h2>
-        {breakdownLoading ? (
-          <Skeleton style={{ height: '16rem', width: '100%' }} />
-        ) : (
-          <div className={styles.compatibleGrid}>
-            <TypeCompatibilityList entries={leftEntries} expanded={expandedType} onToggle={toggleType} />
-            <PokemonLinkGrid pokemon={visiblePokemon} scrollPaneClassName={styles.compatibleScrollPane} />
-            <TypeCompatibilityList entries={rightEntries} expanded={expandedType} onToggle={toggleType} />
+        {/* Mobile: title above a dropdown, both full width. Desktop: the
+            dropdown is replaced by an always-visible type column, and the
+            title moves to sit above the results column next to it — same
+            underlying state either way, just two different surfaces for
+            picking a type (see TypeFilterDropdown/TypeFilterColumn). */}
+        <h2 className={styles.compatibleTitleMobile}>Compatible Pokémon ({move.learned_by_pokemon.length})</h2>
+
+        <div className={styles.dropdownWrapper}>
+          {breakdownLoading ? (
+            <Skeleton style={{ height: '2.25rem', width: '100%', borderRadius: '9999px' }} />
+          ) : (
+            <TypeFilterDropdown entries={breakdown} selected={selectedTypes} onChange={setSelectedTypes} />
+          )}
+        </div>
+
+        <div className={styles.compatibleLayout}>
+          {!breakdownLoading && (
+            <TypeFilterColumn entries={breakdown} selected={selectedTypes} onChange={setSelectedTypes} />
+          )}
+
+          <div className={styles.resultsColumn}>
+            <h2 className={styles.compatibleTitleDesktop}>Compatible Pokémon ({move.learned_by_pokemon.length})</h2>
+
+            {breakdownLoading ? (
+              <Skeleton style={{ height: '16rem', width: '100%' }} />
+            ) : selectedTypes.length === 0 ? (
+              <p className={styles.compatibleEmpty}>Select a type above to see which compatible Pokémon share it.</p>
+            ) : (
+              <PokemonLinkGrid pokemon={visiblePokemon} />
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   )

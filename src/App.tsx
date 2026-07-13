@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { queryClient, persistOptions } from '@/lib/queryClient'
 import { AppShell } from '@/components/layout/AppShell'
 import { HomePage } from '@/routes/HomePage'
@@ -21,7 +20,6 @@ function App() {
           </Route>
         </Routes>
       </BrowserRouter>
-      <ReactQueryDevtools initialIsOpen={false} />
     </PersistQueryClientProvider>
   )
 }

@@ -14,29 +14,36 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
-.hero {
+// A real masonry flow (see PokemonDetailPage.module.scss's .sections for the
+// full reasoning): each card is independent and only ever as tall as its own
+// content, and adding/reordering cards is just editing the JSX below — no
+// grid position bookkeeping. Compatible Pokémon stays out of this, as its
+// own full-width section (see .compatibleSection further down).
+.sections {
+  column-count: 1;
+  column-gap: var(--card-gap);
+
+  @include lg {
+    column-count: 2;
+  }
+}
+
+// Type Matchups and Description reuse the shared SectionCard component (see
+// components/layout/SectionCard) for the card box + heading — only the
+// hero-like move summary needs its own custom card here.
+.moveCard {
   display: flex;
   flex-direction: column;
-  gap: var(--card-gap);
+  gap: 1rem;
   border-radius: var(--radius-2xl);
   border: 1px solid var(--border);
   background-color: color-mix(in oklch, var(--card), transparent 40%);
   padding: var(--card-padding);
-
-  @include lg {
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: space-between;
-  }
-}
-
-.heroLeft {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  margin-bottom: var(--card-gap);
+  break-inside: avoid;
 }
 
 .titleBlock {
@@ -86,25 +93,15 @@
   font-variant-numeric: tabular-nums;
 }
 
-.matchups {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-
-  @include lg {
-    min-width: 20rem;
-  }
-}
-
-.matchupsTitle {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--muted-foreground);
-}
-
 .matchupsIntro {
   margin-top: -0.25rem;
   font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.descriptionText {
+  font-size: 0.9375rem;
+  line-height: 1.5;
   color: var(--muted-foreground);
 }
 
@@ -112,26 +109,71 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--border);
+  background-color: color-mix(in oklch, var(--card), transparent 40%);
+  padding: var(--card-padding);
+  margin-bottom: var(--card-gap);
+  break-inside: avoid;
 }
 
-.compatibleTitle {
+// Mobile-only: title above a full-width dropdown trigger.
+.compatibleTitleMobile {
   text-align: center;
   font-size: var(--heading-section);
   font-weight: 600;
   letter-spacing: -0.01em;
-}
-
-.compatibleGrid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  align-items: start;
-  gap: 1rem;
 
   @include lg {
-    grid-template-columns: 200px minmax(0, 1fr) 200px;
+    display: none;
   }
 }
 
-.compatibleScrollPane {
-  max-height: 65vh;
+.dropdownWrapper {
+  width: 100%;
+
+  @include lg {
+    display: none;
+  }
+}
+
+// Desktop-only: type column on the left, results (with its own title) on
+// the right — TypeFilterColumn hides itself below `lg` via its own styles.
+.compatibleLayout {
+  display: flex;
+  flex-direction: column;
+
+  @include lg {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 2rem;
+    margin-top: 10px;
+  }
+}
+
+.resultsColumn {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.compatibleTitleDesktop {
+  display: none;
+
+  @include lg {
+    display: block;
+    font-size: var(--heading-section);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-align: center;
+  }
+}
+
+.compatibleEmpty {
+  padding: 2rem 0;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
 }
