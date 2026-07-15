@@ -1,4 +1,4 @@
-import { forwardRef, useState } from 'react'
+import { forwardRef, useRef, useState } from 'react'
 import { SearchIcon } from 'lucide-react'
 import { FilterPanelContent } from '@/components/layout/FilterPanelContent'
 import { PokeballIcon } from '@/components/layout/PokeballIcon'
@@ -25,6 +25,21 @@ export const SearchFirstPanel = forwardRef<HTMLInputElement, SearchFirstPanelPro
   // keystroke, since the keyboard shows up regardless — buys results room to
   // breathe. Desktop is untouched; there's no keyboard problem to solve there.
   const [isFocused, setIsFocused] = useState(false)
+  // Tapping a result on mobile blurs this input first (focus moves to the
+  // link), and blur used to collapse the layout synchronously — reflowing
+  // the tile out from under the tap before its click event could fire. A
+  // brief delay lets the tap's click land before anything moves; a fresh
+  // focus cancels it so real refocuses still feel instant.
+  const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+
+  function handleFocus() {
+    clearTimeout(blurTimeoutRef.current)
+    setIsFocused(true)
+  }
+
+  function handleBlur() {
+    blurTimeoutRef.current = setTimeout(() => setIsFocused(false), 200)
+  }
 
   return (
     <div className={styles.card}>
@@ -46,8 +61,8 @@ export const SearchFirstPanel = forwardRef<HTMLInputElement, SearchFirstPanelPro
           value={searchText}
           onChange={(e) => onSearchTextChange(e.target.value)}
           onKeyDown={onSearchKeyDown}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           placeholder="Search Pokémon, moves, types..."
           aria-label="Search Pokémon, moves, types"
           className={styles.searchInput}
