@@ -41,6 +41,8 @@ export const SearchFirstPanel = forwardRef<HTMLInputElement, SearchFirstPanelPro
     blurTimeoutRef.current = setTimeout(() => setIsFocused(false), 200)
   }
 
+  const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.userAgent)
+
   return (
     <div className={styles.card}>
       <div className={cn(styles.header, isFocused && styles.headerCollapsed)}>
@@ -67,6 +69,7 @@ export const SearchFirstPanel = forwardRef<HTMLInputElement, SearchFirstPanelPro
           aria-label="Search Pokémon, moves, types"
           className={styles.searchInput}
         />
+        {!isFocused && <kbd className={styles.shortcutHint}>{isMac ? '⌘K' : 'Ctrl K'}</kbd>}
         <SearchIcon className={styles.searchIcon} />
       </div>
       <FilterPanelContent
