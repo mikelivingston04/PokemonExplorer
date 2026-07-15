@@ -6,6 +6,7 @@ import { useType } from '@/lib/queries/useType'
 import { useCompatibleTypeBreakdown } from '@/lib/queries/useCompatibleTypeBreakdown'
 import { computeOffensiveEffectiveness } from '@/lib/typeEffectiveness'
 import { pickFlavorText } from '@/lib/flavorText'
+import { getEffectiveDamageClass } from '@/lib/legacyDamageClass'
 import { DEFAULT_VERSION_GROUP } from '@/lib/constants/versionGroups'
 import { toDisplayName } from '@/lib/constants/nameOverrides'
 import type { PokemonType } from '@/lib/constants/typeColors'
@@ -68,6 +69,7 @@ export function MoveDetailPage() {
   }
 
   const description = pickFlavorText(move.flavor_text_entries, (e) => e.version_group.name === DEFAULT_VERSION_GROUP)
+  const effectiveDamageClass = getEffectiveDamageClass(move)
 
   return (
     <div className={styles.page}>
@@ -80,8 +82,16 @@ export function MoveDetailPage() {
             <h1 className={styles.title}>{toDisplayName(move.name)}</h1>
             <div className={styles.badgeRow}>
               <TypeBadge type={move.type.name} linkTo />
-              <Badge variant="secondary">
-                {DAMAGE_CLASS_LABELS[move.damage_class.name] ?? move.damage_class.name}
+              <Badge
+                variant="secondary"
+                className={effectiveDamageClass.isLegacyOverride ? styles.legacyBadge : undefined}
+                title={
+                  effectiveDamageClass.isLegacyOverride
+                    ? `Move category was determined by type before Generation IV — ${toDisplayName(move.type.name)}-type moves were ${DAMAGE_CLASS_LABELS[effectiveDamageClass.name]} in Generation I–III games like FireRed. PokéAPI only reports the current (post-Gen-IV) category, which is ${DAMAGE_CLASS_LABELS[move.damage_class.name]}.`
+                    : undefined
+                }
+              >
+                {DAMAGE_CLASS_LABELS[effectiveDamageClass.name] ?? effectiveDamageClass.name}
               </Badge>
               {tmLoading ? (
                 <Skeleton style={{ height: '1.25rem', width: '3.5rem' }} />

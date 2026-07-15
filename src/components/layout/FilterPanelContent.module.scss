@@ -43,6 +43,26 @@
   }
 }
 
+.mobileCategoryRowHidden {
+  display: none;
+}
+
+// Desktop never shows this (the row above it is never collapsed there
+// either), even if `collapsed` somehow got passed true.
+.collapsedHint {
+  display: block;
+  border-radius: 9999px;
+  border: 1px dashed var(--border);
+  padding: 0.5rem 0.875rem;
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+
+  @include sm {
+    display: none;
+  }
+}
+
 .mobileTrigger {
   display: flex;
   cursor: pointer;
@@ -82,6 +102,8 @@
 
 .clearAll {
   margin-left: auto;
+  font-size: 0.9rem;
+  color: red;
 }
 
 .toggle {

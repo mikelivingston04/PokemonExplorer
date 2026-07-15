@@ -17,6 +17,16 @@
   gap: 1.5rem;
 }
 
+// Dotted underline signals "hover for more" — this badge shows the move's
+// Generation I–III category (which differs from PokéAPI's always-current
+// value), and the full explanation is one tooltip away rather than clutter
+// on the page by default.
+.legacyBadge {
+  cursor: help;
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+}
+
 // A real masonry flow (see PokemonDetailPage.module.scss's .sections for the
 // full reasoning): each card is independent and only ever as tall as its own
 // content, and adding/reordering cards is just editing the JSX below — no

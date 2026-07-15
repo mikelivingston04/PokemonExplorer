@@ -3,11 +3,17 @@ import { Outlet, useNavigate, useSearchParams } from 'react-router-dom'
 import { filterStateFromSearchParams, filterStateToSearchParams } from '@/lib/urlState'
 import { useFilteredPokemon } from '@/lib/queries/useFilteredPokemon'
 import { useExpensiveFilteredPokemon } from '@/lib/queries/useExpensiveFilteredPokemon'
-import { useSearchIndex } from '@/lib/queries/useSearchIndex'
+import { useSearchIndex, type SearchCategory } from '@/lib/queries/useSearchIndex'
 import { isFilterActive, type FilterState } from '@/lib/filterEngine/types'
 import { SearchFirstPanel } from '@/components/layout/SearchFirstPanel'
 import { SearchResultsPanel } from '@/components/layout/SearchResultsPanel'
 import styles from './AppShell.module.scss'
+
+const CATEGORY_ROUTE: Record<SearchCategory, string> = {
+  pokemon: '/pokemon',
+  move: '/move',
+  type: '/type',
+}
 
 // The search box (input + filters) is a permanent fixture at the top of
 // every page, not a modal or a page-specific widget — typing or picking a
@@ -126,6 +132,21 @@ export function AppShell() {
       : 'Checking...'
     : undefined
 
+  // Pokémon-first, matching the order the rows themselves render in.
+  const firstResult = pokemonEntries[0] ?? moveEntries[0] ?? typeEntries[0]
+
+  function handleSearchKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (!isActivated) return
+    if (e.key === 'Enter') {
+      if (!firstResult) return
+      e.preventDefault()
+      navigate(`${CATEGORY_ROUTE[firstResult.category]}/${firstResult.name}`)
+    } else if (e.key === 'Escape' && searchText) {
+      e.preventDefault()
+      updateSearchText('')
+    }
+  }
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
@@ -136,6 +157,7 @@ export function AppShell() {
           filters={filters}
           onFiltersChange={updateFilters}
           onClearAll={clearAll}
+          onSearchKeyDown={handleSearchKeyDown}
         />
         {isActivated ? (
           <SearchResultsPanel

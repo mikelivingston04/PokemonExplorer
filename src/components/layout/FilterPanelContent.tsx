@@ -57,6 +57,10 @@ interface FilterPanelContentProps {
   // Always rendered (not gated on whether anything's active) since it
   // doubles as a home button on every page, including detail pages.
   onClearAll: () => void
+  // Mobile only: search input has focus, so the toggle row is swapped for a
+  // compact "N filters active" note instead — reassurance that nothing got
+  // cleared, not just silently gone. Selections are untouched either way.
+  collapsed: boolean
 }
 
 function CategoryToggle({
@@ -72,7 +76,10 @@ function CategoryToggle({
 }) {
   return (
     <label className={styles.toggle}>
-      <Switch checked={active} onCheckedChange={onToggle} />
+      {/* Tab from the search input goes straight to results, not through
+          five toggles first — still fully clickable, just out of the
+          sequential keyboard-tab flow (mouse/tap users are unaffected). */}
+      <Switch checked={active} onCheckedChange={onToggle} tabIndex={-1} />
       <span className={hasValue ? styles.toggleLabelActive : styles.toggleLabel}>{label}</span>
     </label>
   )
@@ -238,10 +245,11 @@ function CategoryOptions({
   }
 }
 
-export function FilterPanelContent({ filters, onChange, onClearAll }: FilterPanelContentProps) {
+export function FilterPanelContent({ filters, onChange, onClearAll, collapsed }: FilterPanelContentProps) {
   const [expanded, setExpanded] = useState<Set<CategoryKey>>(
     () => new Set(CATEGORIES.filter((c) => categoryHasValue(c.key, filters)).map((c) => c.key)),
   )
+  const activeCount = CATEGORIES.filter((c) => categoryHasValue(c.key, filters)).length
 
   // Auto-expand a category the first time it picks up a value (e.g. the
   // Gen-1 default applied after mount), without fighting the user's own
@@ -292,7 +300,7 @@ export function FilterPanelContent({ filters, onChange, onClearAll }: FilterPane
             onToggle={() => toggleCategory(c.key)}
           />
         ))}
-        <Button variant="ghost" size="sm" className={styles.clearAll} onClick={handleClearAll}>
+        <Button variant="ghost" size="sm" className={styles.clearAll} onClick={handleClearAll} tabIndex={-1}>
           Clear all
         </Button>
       </div>
@@ -306,7 +314,7 @@ export function FilterPanelContent({ filters, onChange, onClearAll }: FilterPane
       {/* Mobile: an inline row would grow taller every time a category is
           picked (5 toggles, each adding a wrapped options row of its own) —
           a popover per category keeps the box's height constant instead. */}
-      <div className={styles.mobileCategoryRow}>
+      <div className={cn(styles.mobileCategoryRow, collapsed && styles.mobileCategoryRowHidden)}>
         {CATEGORIES.map((c) => (
           <Popover key={c.key}>
             <PopoverTrigger
@@ -320,10 +328,18 @@ export function FilterPanelContent({ filters, onChange, onClearAll }: FilterPane
             </PopoverContent>
           </Popover>
         ))}
-        <Button variant="ghost" size="sm" className={styles.clearAll} onClick={handleClearAll}>
+        <Button variant="ghost" size="sm" className={styles.clearAll} onClick={handleClearAll} tabIndex={-1}>
           Clear all
         </Button>
       </div>
+
+      {/* Reassurance, not just empty space — without this, hiding the row
+          above while typing could read as "did my filters just reset?" */}
+      {collapsed && activeCount > 0 && (
+        <p className={styles.collapsedHint}>
+          {activeCount} filter{activeCount === 1 ? '' : 's'} still active — tap outside search to view
+        </p>
+      )}
     </div>
   )
 }

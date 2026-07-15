@@ -1,3 +1,5 @@
+@use 'styles/mixins' as *;
+
 .card {
   display: flex;
   width: 100%;
@@ -16,6 +18,17 @@
   align-items: center;
   gap: 0.25rem;
   text-align: center;
+}
+
+// Mobile only — the keyboard eats too much space to also spare room for
+// this once you're actively searching. Always shown at `sm`+, regardless of
+// focus, since desktop has no keyboard to make room for.
+.headerCollapsed {
+  display: none;
+
+  @include sm {
+    display: flex;
+  }
 }
 
 .titleRow {
