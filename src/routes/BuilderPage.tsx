@@ -1,5 +1,6 @@
 import { useBuilder } from '@/lib/builder/useBuilder'
 import { BuilderPokemonRow } from '@/components/builder/BuilderPokemonRow'
+import { TypeCoverageCard } from '@/components/builder/TypeCoverageCard'
 import builderPlaceholder from '@/assets/builder-placeholder.png'
 import styles from './BuilderPage.module.scss'
 
@@ -19,7 +20,8 @@ export function BuilderPage() {
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.title}>Your Team</h1>
+      <h2 className={styles.title}>Your Team</h2>
+      <TypeCoverageCard />
       <div className={styles.rows}>
         {team.map((name) => (
           <BuilderPokemonRow key={name} name={name} onRemove={() => removeFromBuilder(name)} />

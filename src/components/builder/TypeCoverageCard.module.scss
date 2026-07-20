@@ -1,0 +1,79 @@
+@use 'styles/mixins' as *;
+
+.root {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: color-mix(in oklch, var(--card), transparent 40%);
+}
+
+.trigger {
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--foreground);
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: color-mix(in oklch, var(--foreground), transparent 95%);
+  }
+
+  &[data-panel-open] .chevron {
+    transform: rotate(180deg);
+  }
+}
+
+.triggerLabel {
+  font-size: 0.875rem;
+}
+
+.triggerRight {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.triggerCount {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+
+.chevron {
+  width: 1rem;
+  height: 1rem;
+  color: var(--muted-foreground);
+  transition: transform 0.15s ease;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem 1.5rem;
+  padding: 0.875rem 1rem 1rem;
+  border-top: 1px solid var(--border);
+
+  @include sm {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.checkIcon {
+  width: 1rem;
+  height: 1rem;
+  margin-left: auto;
+  color: oklch(0.765 0.177 163.223); // matches the app's existing "active" emerald accent
+}
+
+.xIcon {
+  width: 1rem;
+  height: 1rem;
+  margin-left: auto;
+  color: var(--destructive);
+}

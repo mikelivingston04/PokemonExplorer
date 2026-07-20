@@ -1,0 +1,22 @@
+.trigger {
+  display: flex;
+  width: 100%;
+  cursor: pointer;
+  align-items: center;
+  justify-content: space-between;
+  outline: none;
+}
+
+.panel {
+  height: 0;
+  overflow: hidden;
+  transition: height 0.2s ease;
+
+  &[data-open] {
+    height: var(--collapsible-panel-height);
+  }
+
+  &[data-ending-style] {
+    height: 0;
+  }
+}

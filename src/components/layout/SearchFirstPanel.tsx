@@ -66,7 +66,7 @@ export const SearchFirstPanel = forwardRef<HTMLInputElement, SearchFirstPanelPro
           {/* Not an <h1> — this box appears on every page, and each page
               (Pokémon/Move/Type names) owns the real page heading. This is
               persistent site branding, closer to a logo than a heading. */}
-          <p className={styles.title}>Pokémon explorer</p>
+          <h1 className={styles.title}>Pokémon explorer</h1>
         </div>
         <p className={styles.subtitle}>a personal Pokédex, built to poke around in</p>
       </div>

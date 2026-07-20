@@ -301,7 +301,7 @@ export function FilterPanelContent({ filters, onChange, onClearAll, collapsed }:
           />
         ))}
         <Button variant="ghost" size="sm" className={styles.clearAll} onClick={handleClearAll} tabIndex={-1}>
-          Clear all
+          Reset filters
         </Button>
       </div>
 
@@ -329,7 +329,7 @@ export function FilterPanelContent({ filters, onChange, onClearAll, collapsed }:
           </Popover>
         ))}
         <Button variant="ghost" size="sm" className={styles.clearAll} onClick={handleClearAll} tabIndex={-1}>
-          Clear all
+          Reset filters
         </Button>
       </div>
 
