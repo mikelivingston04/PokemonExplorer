@@ -1,4 +1,6 @@
+import { Fragment } from 'react'
 import { useBuilder } from '@/lib/builder/useBuilder'
+import { TEAM_CAP } from '@/lib/builder/context'
 import { BuilderPokemonRow } from '@/components/builder/BuilderPokemonRow'
 import { TypeCoverageCard } from '@/components/builder/TypeCoverageCard'
 import builderPlaceholder from '@/assets/builder-placeholder.png'
@@ -23,8 +25,18 @@ export function BuilderPage() {
       <h2 className={styles.title}>Your Team</h2>
       <TypeCoverageCard />
       <div className={styles.rows}>
-        {team.map((name) => (
-          <BuilderPokemonRow key={name} name={name} onRemove={() => removeFromBuilder(name)} />
+        {team.map((name, i) => (
+          <Fragment key={name}>
+            {i === TEAM_CAP && (
+              <div className={styles.capDivider}>
+                <span className={styles.capDividerLabel}>
+                  Teams cap at {TEAM_CAP} — anything below is just extra bench space and won't count
+                  toward type coverage
+                </span>
+              </div>
+            )}
+            <BuilderPokemonRow name={name} onRemove={() => removeFromBuilder(name)} />
+          </Fragment>
         ))}
       </div>
     </div>

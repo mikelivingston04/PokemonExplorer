@@ -5,23 +5,28 @@ import { getType } from '@/lib/api/type'
 import { computeOffensiveEffectiveness } from '@/lib/typeEffectiveness'
 import { ALL_TYPE_NAMES, type PokemonType } from '@/lib/constants/typeColors'
 import { useBuilder } from '@/lib/builder/useBuilder'
+import { TEAM_CAP } from '@/lib/builder/context'
 
 // Offensive coverage, purely from selected moves — not each Pokémon's own
 // type. A Lapras with Thunderbolt taped on for Electric coverage should
 // count, even though Lapras itself isn't Electric-type.
+//
+// Only the first 6 team members count — anything past the real team cap is
+// bench/overflow space and shouldn't factor into "your team's" coverage.
 export function useTeamCoverage() {
   const { team, getMoves } = useBuilder()
+  const activeTeam = team.slice(0, TEAM_CAP)
 
   const moveNames = useMemo(() => {
     const names = new Set<string>()
-    for (const pokemonName of team) {
+    for (const pokemonName of activeTeam) {
       for (const moveName of getMoves(pokemonName)) {
         if (moveName) names.add(moveName)
       }
     }
     return [...names]
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [team.join(','), team.map((n) => getMoves(n).join('|')).join(',')])
+  }, [activeTeam.join(','), activeTeam.map((n) => getMoves(n).join('|')).join(',')])
 
   const moveResults = useQueries({
     queries: moveNames.map((name) => ({

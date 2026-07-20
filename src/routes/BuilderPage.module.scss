@@ -48,3 +48,33 @@
   flex-direction: column;
   gap: 0.75rem;
 }
+
+// Marks where a real in-game team would stop — everything below is still
+// fully usable (moves, coverage math just ignores it), so this is a quiet
+// note, not a wall.
+.capDivider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  &::before,
+  &::after {
+    content: '';
+    height: 1px;
+    flex: 1;
+    background: var(--border);
+  }
+}
+
+.capDividerLabel {
+  flex-shrink: 0;
+  max-width: 13rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  opacity: 0.7;
+
+  @include sm {
+    max-width: 34rem;
+  }
+}

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react'
-import { Outlet, useNavigate, useSearchParams } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { filterStateFromSearchParams, filterStateToSearchParams } from '@/lib/urlState'
 import { useFilteredPokemon } from '@/lib/queries/useFilteredPokemon'
 import { useExpensiveFilteredPokemon } from '@/lib/queries/useExpensiveFilteredPokemon'
@@ -23,6 +23,7 @@ const CATEGORY_ROUTE: Record<SearchCategory, string> = {
 export function AppShell() {
   const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
+  const location = useLocation()
   const inputRef = useRef<HTMLInputElement>(null)
 
   const searchText = searchParams.get('q') ?? ''
@@ -78,10 +79,17 @@ export function AppShell() {
     setSearchParams(buildParams(filters, next), { replace: true })
   }
 
-  // Clears filters and search text together and drops back to "/" — a
-  // plain path with no query string, so it doubles as a home button.
+  // Clears filters and search text together. Everywhere else this doubles
+  // as a home button (drop back to "/", a plain path with no query string)
+  // — but on the Builder page, navigating away on "Reset filters" reads
+  // like it just wiped the team, so it only clears the query string there
+  // and leaves you on the page you're already looking at.
   function clearAll() {
-    navigate('/')
+    if (location.pathname === '/builder') {
+      setSearchParams(new URLSearchParams())
+    } else {
+      navigate('/')
+    }
   }
 
   const { names: tier1Names, isLoading: tier1Loading } = useFilteredPokemon(filters)
