@@ -7,7 +7,7 @@ import styles from './SearchResultsPanel.module.scss'
 
 const TILE_CAP = 6
 
-function TileLink({ entry, route, children }: { entry: SearchIndexEntry; route: string; children: ReactNode }) {
+export function TileLink({ entry, route, children }: { entry: SearchIndexEntry; route: string; children: ReactNode }) {
   return (
     <Link to={`${route}/${entry.name}`} className={styles.tile}>
       {children}

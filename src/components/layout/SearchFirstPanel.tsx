@@ -1,7 +1,9 @@
 import { forwardRef, useRef, useState } from 'react'
-import { SearchIcon } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { MenuIcon, SearchIcon } from 'lucide-react'
 import { FilterPanelContent } from '@/components/layout/FilterPanelContent'
 import { PokeballIcon } from '@/components/layout/PokeballIcon'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 import type { FilterState } from '@/lib/filterEngine/types'
 import styles from './SearchFirstPanel.module.scss'
@@ -42,9 +44,22 @@ export const SearchFirstPanel = forwardRef<HTMLInputElement, SearchFirstPanelPro
   }
 
   const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.userAgent)
+  const navigate = useNavigate()
 
   return (
     <div className={styles.card}>
+      {/* Global nav toggle, not tied to header-collapse — stays put even
+          while the search input is focused on mobile. */}
+      <DropdownMenu>
+        <DropdownMenuTrigger className={styles.menuTrigger} aria-label="Open navigation menu">
+          <MenuIcon className={styles.menuTriggerIcon} />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem onClick={() => navigate('/')}>Explorer</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate('/builder')}>Builder</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
       <div className={cn(styles.header, isFocused && styles.headerCollapsed)}>
         <div className={styles.titleRow}>
           <PokeballIcon className={styles.titleIcon} />

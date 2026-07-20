@@ -6,7 +6,7 @@ import { useType } from '@/lib/queries/useType'
 import { useCompatibleTypeBreakdown } from '@/lib/queries/useCompatibleTypeBreakdown'
 import { computeOffensiveEffectiveness } from '@/lib/typeEffectiveness'
 import { pickFlavorText } from '@/lib/flavorText'
-import { getEffectiveDamageClass } from '@/lib/legacyDamageClass'
+import { getEffectiveDamageClass, DAMAGE_CLASS_LABELS } from '@/lib/legacyDamageClass'
 import { DEFAULT_VERSION_GROUP } from '@/lib/constants/versionGroups'
 import { toDisplayName } from '@/lib/constants/nameOverrides'
 import type { PokemonType } from '@/lib/constants/typeColors'
@@ -19,12 +19,6 @@ import { SectionCard } from '@/components/layout/SectionCard'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import styles from './MoveDetailPage.module.scss'
-
-const DAMAGE_CLASS_LABELS: Record<string, string> = {
-  physical: 'Physical',
-  special: 'Special',
-  status: 'Status',
-}
 
 function StatTile({ label, value }: { label: string; value: string }) {
   return (

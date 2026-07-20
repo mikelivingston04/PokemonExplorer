@@ -1,6 +1,7 @@
 @use 'styles/mixins' as *;
 
 .card {
+  position: relative;
   display: flex;
   width: 100%;
   flex-direction: column;
@@ -10,6 +11,30 @@
   background: color-mix(in oklch, var(--card), transparent 20%);
   padding: 1.25rem 1.75rem;
   box-shadow: 0 20px 60px -20px oklch(0 0 0 / 0.5);
+}
+
+.menuTrigger {
+  position: absolute;
+  top: 1rem;
+  left: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  color: var(--muted-foreground);
+  transition: background-color 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: color-mix(in oklch, var(--foreground), transparent 92%);
+    color: var(--foreground);
+  }
+}
+
+.menuTriggerIcon {
+  width: 1.125rem;
+  height: 1.125rem;
 }
 
 .header {

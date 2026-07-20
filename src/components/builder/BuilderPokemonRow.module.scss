@@ -1,0 +1,127 @@
+@use 'styles/mixins' as *;
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--border);
+  background-color: color-mix(in oklch, var(--card), transparent 40%);
+  padding: var(--card-padding);
+}
+
+.loadingRow {
+  height: 9.5rem;
+  border-radius: var(--radius-2xl);
+}
+
+.top {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  // Reserve room so the absolutely-positioned remove button never overlaps
+  // the stats, even when they wrap onto their own line on narrow widths.
+  padding-right: 2.25rem;
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.sprite {
+  height: 3.5rem;
+  width: 3.5rem;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.identityText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.dexNumber {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.typeRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.125rem;
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 1.25rem;
+  margin-left: auto;
+  margin-right: 15px;
+}
+
+.statTile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.125rem;
+}
+
+.statLabel {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted-foreground);
+}
+
+.statValue {
+  font-size: 1rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+// Pinned to the row's corner (not just "last in the flex flow") so it stays
+// put even when .stats wraps onto its own line on narrow widths. Centered
+// via top/bottom auto-margins rather than a translateY transform — the
+// shared .button:active rule sets its own transform on press, which would
+// otherwise stomp a translateY-based centering and jump the button out from
+// under the cursor mid-click.
+.removeButton {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  margin: auto 0;
+  color: var(--muted-foreground);
+  transition: color 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    border-color: color-mix(in oklch, var(--destructive), transparent 40%);
+    color: var(--destructive);
+  }
+}
+
+.moveSlots {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.625rem;
+
+  @include sm {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

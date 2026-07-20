@@ -1,6 +1,8 @@
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
+import { CheckIcon, PlusIcon } from 'lucide-react'
 import { usePokemon } from '@/lib/queries/usePokemon'
+import { useBuilder } from '@/lib/builder/useBuilder'
 import { usePokemonSpecies } from '@/lib/queries/usePokemonSpecies'
 import { useEvolutionChain } from '@/lib/queries/useEvolutionChain'
 import { useType } from '@/lib/queries/useType'
@@ -22,6 +24,7 @@ import { TypeEffectivenessChart } from '@/components/types/TypeEffectivenessChar
 import { LocationsList } from '@/components/pokemon/LocationsList'
 import { SectionCard } from '@/components/layout/SectionCard'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import styles from './PokemonDetailPage.module.scss'
@@ -37,8 +40,10 @@ function StatTile({ label, value }: { label: string; value: string }) {
 
 export function PokemonDetailPage() {
   const { name } = useParams<{ name: string }>()
+  const navigate = useNavigate()
   const [quickViewOpen, setQuickViewOpen] = useState(false)
   const { data: pokemon, isLoading, isError } = usePokemon(name)
+  const { isInBuilder, addToBuilder, removeFromBuilder } = useBuilder()
   // Alt-forms (e.g. "charizard-mega-x") aren't species themselves — the
   // species resource always lives under the base name in pokemon.species.
   const { data: species } = usePokemonSpecies(pokemon?.species.name)
@@ -121,6 +126,32 @@ export function PokemonDetailPage() {
               {species && <Badge variant="secondary">{generationLabel(species.generation.name)}</Badge>}
               {species?.is_legendary && <Badge variant="secondary">Legendary</Badge>}
               {species?.is_mythical && <Badge variant="secondary">Mythical</Badge>}
+
+              <div className={styles.builderActions}>
+                <Button
+                  type="button"
+                  variant={isInBuilder(pokemon.name) ? 'secondary' : 'outline'}
+                  size="sm"
+                  onClick={() =>
+                    isInBuilder(pokemon.name) ? removeFromBuilder(pokemon.name) : addToBuilder(pokemon.name)
+                  }
+                >
+                  {isInBuilder(pokemon.name) ? (
+                    <>
+                      <CheckIcon /> In Builder
+                    </>
+                  ) : (
+                    <>
+                      <PlusIcon /> Add to Builder
+                    </>
+                  )}
+                </Button>
+                {isInBuilder(pokemon.name) && (
+                  <Button type="button" variant="ghost" size="sm" onClick={() => navigate('/builder')}>
+                    Go to Builder
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </div>

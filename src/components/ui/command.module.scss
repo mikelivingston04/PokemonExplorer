@@ -123,19 +123,3 @@
     }
   }
 }
-
-// Scoped narrowly (not a blanket "svg" selector) so it doesn't fight the
-// deliberate sizing on icons/sprites rendered inside a CommandItem's own
-// children (e.g. type icons in the search modal's move tiles).
-.checkIcon {
-  pointer-events: none;
-  flex-shrink: 0;
-  width: 1rem;
-  height: 1rem;
-  margin-left: auto;
-  opacity: 0;
-
-  &[data-checked='true'] {
-    opacity: 1;
-  }
-}

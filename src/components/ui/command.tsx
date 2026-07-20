@@ -13,7 +13,7 @@ import {
   InputGroupAddon,
 } from "@/components/ui/input-group"
 import styles from "./command.module.scss"
-import { SearchIcon, CheckIcon } from "lucide-react"
+import { SearchIcon } from "lucide-react"
 
 function Command({ className, ...props }: React.ComponentProps<typeof CommandPrimitive>) {
   return (
@@ -49,7 +49,7 @@ function CommandDialog({
         className={cn(styles.dialogContent, className)}
         showCloseButton={showCloseButton}
       >
-        {children}
+        <Command>{children}</Command>
       </DialogContent>
     </Dialog>
   )
@@ -102,16 +102,13 @@ function CommandGroup({ className, ...props }: React.ComponentProps<typeof Comma
   )
 }
 
-function CommandItem({ className, children, ...props }: React.ComponentProps<typeof CommandPrimitive.Item>) {
+function CommandItem({ className, ...props }: React.ComponentProps<typeof CommandPrimitive.Item>) {
   return (
     <CommandPrimitive.Item
       data-slot="command-item"
       className={cn(styles.item, className)}
       {...props}
-    >
-      {children}
-      <CheckIcon className={styles.checkIcon} />
-    </CommandPrimitive.Item>
+    />
   )
 }
 

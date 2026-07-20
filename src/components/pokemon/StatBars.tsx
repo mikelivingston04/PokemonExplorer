@@ -1,14 +1,6 @@
 import type { PokemonStat } from '@/types/pokeapi'
+import { STAT_LABELS } from '@/lib/constants/stats'
 import styles from './StatBars.module.scss'
-
-const STAT_LABELS: Record<string, string> = {
-  hp: 'HP',
-  attack: 'Attack',
-  defense: 'Defense',
-  'special-attack': 'Sp. Atk',
-  'special-defense': 'Sp. Def',
-  speed: 'Speed',
-}
 
 // Theoretical max base stat across all Pokémon (Blissey's HP / Shuckle's Def) —
 // used purely to scale bar width consistently, not a claim about the true ceiling.

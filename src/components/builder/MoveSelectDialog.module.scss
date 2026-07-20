@@ -1,0 +1,80 @@
+@use 'styles/mixins' as *;
+
+// [data-slot='command-item'] boosts specificity above command.module.scss's
+// plain .item class, so these overrides win regardless of CSS bundle order
+// between the two files.
+[data-slot='command-item'].option {
+  height: auto;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.25rem;
+  padding: 0.7rem 0.75rem;
+  // Transparent by default so the hover state below only changes color,
+  // not layout (a border that appears from nothing shifts neighboring rows).
+  border: 1px solid transparent;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+
+  &:hover {
+    border-color: color-mix(in oklch, var(--foreground), transparent 75%);
+    background: color-mix(in oklch, var(--foreground), transparent 95%);
+  }
+
+  // Narrow widths don't have room for name + 3 stats on one line without
+  // truncating the name into unreadable mush — stack them instead. Desktop
+  // has the width to spare, so it stays a single row.
+  @include sm {
+    flex-direction: row;
+    align-items: center;
+    gap: 0;
+  }
+}
+
+.optionHeader {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+// Deliberately its own (smaller, plainer) sizing — this is the search
+// dialog's result list, not the filled move-slot tile on the Builder row
+// (see MoveSlot.module.scss), so it shouldn't inherit that larger styling.
+.optionClass {
+  flex-shrink: 0;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted-foreground);
+
+  &[data-class='special'] {
+    // -webkit-text-stroke: 0.6px #d9a521;
+    color: #d9a521;
+  }
+
+  &[data-class='physical'] {
+    // -webkit-text-stroke: 0.6px #d9a521;
+    color: white;
+  }
+}
+
+.optionName {
+  overflow: hidden;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.optionStats {
+  display: flex;
+  flex-shrink: 0;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+
+  b {
+    color: var(--foreground);
+    font-weight: 600;
+  }
+}

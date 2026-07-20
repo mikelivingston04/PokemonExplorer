@@ -29,6 +29,12 @@ export interface EffectiveDamageClass {
   isLegacyOverride: boolean
 }
 
+export const DAMAGE_CLASS_LABELS: Record<string, string> = {
+  physical: 'Physical',
+  special: 'Special',
+  status: 'Status',
+}
+
 // Status moves don't use Attack/Defense/Special stats regardless of era, so
 // there's nothing to reclassify — the override only matters for moves that
 // actually deal damage.
