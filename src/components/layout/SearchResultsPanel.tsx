@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { PokemonTileContent, MoveTileContent, TypeTileContent } from '@/components/search/SearchResultTiles'
+import { MoveTileContent, TypeTileContent } from '@/components/search/SearchResultTiles'
 import { PokemonGrid } from '@/components/pokemon/PokemonGrid'
+import { PokemonCard } from '@/components/pokemon/PokemonCard'
 import type { SearchIndexEntry } from '@/lib/queries/useSearchIndex'
 import styles from './SearchResultsPanel.module.scss'
 
@@ -85,22 +86,27 @@ export function SearchResultsPanel({
 
   return (
     <div className={styles.panel}>
-      {pokemonEntries.length > 0 &&
-        (pokemonExpanded ? (
-          <section className={styles.row}>
-            <h2 className={styles.rowLabel}>Pokémon</h2>
+      {pokemonEntries.length > 0 && (
+        <section className={styles.row}>
+          <h2 className={styles.rowLabel}>Pokémon</h2>
+          {pokemonExpanded ? (
             <PokemonGrid names={pokemonNames} isLoading={isPokemonLoading} checkingStatus={checkingStatus} />
-          </section>
-        ) : (
-          <ResultRow
-            label="Pokémon"
-            entries={pokemonEntries}
-            route="/pokemon"
-            renderContent={(entry) => <PokemonTileContent entry={entry} />}
-            expanded={false}
-            onExpand={() => setPokemonExpanded(true)}
-          />
-        ))}
+          ) : (
+            <>
+              <div className={styles.pokemonPreviewGrid}>
+                {pokemonEntries.slice(0, TILE_CAP).map((entry) => (
+                  <PokemonCard key={entry.name} name={entry.name} />
+                ))}
+              </div>
+              {pokemonEntries.length > TILE_CAP && (
+                <button type="button" onClick={() => setPokemonExpanded(true)} className={styles.expandBar}>
+                  Expand results ({pokemonEntries.length})
+                </button>
+              )}
+            </>
+          )}
+        </section>
+      )}
       <ResultRow
         label="Moves"
         entries={moveEntries}

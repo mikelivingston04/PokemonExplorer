@@ -1,3 +1,5 @@
+@use 'styles/mixins' as *;
+
 .empty {
   font-size: 0.875rem;
   color: var(--muted-foreground);
@@ -6,21 +8,35 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
 }
 
 .row {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  border-bottom: 1px solid var(--border);
+
+  &:last-child {
+    border-bottom: none;
+  }
 }
 
 .label {
-  width: 10rem;
+  width: 9rem;
   flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  padding-right: 0.875rem;
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--muted-foreground);
+
+  @include sm {
+    width: 11rem;
+  }
 }
 
 .badges {

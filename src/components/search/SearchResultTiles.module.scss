@@ -1,8 +1,4 @@
-.pokemonSprite {
-  height: 2.25rem;
-  width: 2.25rem;
-  object-fit: contain;
-}
+@use 'styles/mixins' as *;
 
 .tileText {
   display: flex;
@@ -23,16 +19,10 @@
   font-variant-numeric: tabular-nums;
 }
 
-.tileTypeStack {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
 .moveIcon {
   display: flex;
-  height: 2.25rem;
-  width: 2.25rem;
+  height: 3.25rem;
+  width: 5rem;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
@@ -41,8 +31,8 @@
 }
 
 .moveIconSvg {
-  width: 1.125rem;
-  height: 1.125rem;
+  width: 2.125rem;
+  height: 2.125rem;
 }
 
 .moveNameRow {
@@ -53,6 +43,19 @@
 
 .typeTileBadge {
   font-size: 0.875rem;
+
+  // Mobile only: tiles stack full-width in a single column there, so a
+  // fixed-width badge keeps "Strong against" starting at the same x
+  // position on every row instead of drifting with each type name's
+  // length. Desktop tiles wrap side-by-side instead of stacking, so
+  // there's no shared column to align.
+  width: 5rem;
+  justify-content: center;
+
+  @include sm {
+    width: auto;
+    justify-content: flex-start;
+  }
 }
 
 .strongAgainstLabel {

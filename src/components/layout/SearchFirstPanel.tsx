@@ -48,10 +48,14 @@ export const SearchFirstPanel = forwardRef<HTMLInputElement, SearchFirstPanelPro
 
   return (
     <div className={styles.card}>
-      {/* Global nav toggle, not tied to header-collapse — stays put even
-          while the search input is focused on mobile. */}
+      {/* Mobile only: hides while the search input is focused, same as the
+          branding header below — keyboard leaves little room to spare, and
+          a nav toggle sitting there mid-search just reads as clutter. */}
       <DropdownMenu>
-        <DropdownMenuTrigger className={styles.menuTrigger} aria-label="Open navigation menu">
+        <DropdownMenuTrigger
+          className={cn(styles.menuTrigger, isFocused && styles.menuTriggerHidden)}
+          aria-label="Open navigation menu"
+        >
           <MenuIcon className={styles.menuTriggerIcon} />
         </DropdownMenuTrigger>
         <DropdownMenuContent>

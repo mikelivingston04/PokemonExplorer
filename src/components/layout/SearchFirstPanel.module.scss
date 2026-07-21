@@ -37,6 +37,17 @@
   height: 1.125rem;
 }
 
+// Mobile only — same reasoning as .headerCollapsed: the keyboard eats the
+// space, and a nav toggle sitting there while you're mid-search reads as
+// clutter. Always shown at `sm`+, regardless of focus.
+.menuTriggerHidden {
+  display: none;
+
+  @include sm {
+    display: flex;
+  }
+}
+
 .header {
   display: flex;
   flex-direction: column;
