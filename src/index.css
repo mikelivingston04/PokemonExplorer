@@ -11,7 +11,8 @@
     --sprite-size-grid: 5rem;       /* Pokémon sprite size in the search/filter results grid */
     --sprite-size-evolution: 6rem;  /* sprite size in the Evolution Chain cards */
     --sprite-size-hero: 11rem;      /* the big sprite on a Pokémon's own detail page */
-    --sprite-size-quickview: 14rem; /* sprite size in the "view larger image" popup */
+    --sprite-size-quickview: 25rem; /* sprite size in the "view larger image" popup */
+    --sprite-size-quickview-mobile: 20rem; /* sprite size in the "view larger image" popup on small screens */
     --heading-page-title: 2.25rem;  /* the big Pokémon/move name heading */
     --heading-section: 1.125rem;    /* card titles like "Base Stats", "Evolution Chain" */
     /* Corner roundness for cards/buttons/badges is controlled by --radius

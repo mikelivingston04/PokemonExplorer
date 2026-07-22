@@ -91,16 +91,14 @@ export function PokemonDetailPage() {
           order, so it always lands top-left; reordering or adding a section
           elsewhere is just moving/adding a card below it. */}
       <div className={styles.sections}>
-        <div
-          className={styles.hero}
-          style={
-            glowColor
-              ? { backgroundImage: `radial-gradient(circle at 20% 25%, ${glowColor}26, transparent 65%)` }
-              : undefined
-          }
-        >
+        <div className={styles.hero}>
           <div className={styles.heroSpriteWrapper}>
-            {glowColor && <div className={styles.heroGlow} style={{ backgroundColor: glowColor }} />}
+            {glowColor && (
+              <div
+                className={styles.heroGlow}
+                style={{ background: `radial-gradient(circle, ${glowColor}59 0%, ${glowColor}14 40%, transparent 65%)` }}
+              />
+            )}
             <button
               type="button"
               onClick={() => setQuickViewOpen(true)}
@@ -207,13 +205,18 @@ export function PokemonDetailPage() {
       </div>
 
       <Dialog open={quickViewOpen} onOpenChange={setQuickViewOpen}>
-        <DialogContent>
+        <DialogContent className={styles.quickViewContent}>
           <DialogHeader>
             <DialogTitle className="sr-only">{toDisplayName(pokemon.name)}</DialogTitle>
           </DialogHeader>
           <div className={styles.quickViewBody}>
             <div className={styles.quickViewSpriteWrapper}>
-              {glowColor && <div className={styles.quickViewGlow} style={{ backgroundColor: glowColor }} />}
+              {glowColor && (
+                <div
+                  className={styles.quickViewGlow}
+                  style={{ background: `radial-gradient(circle, ${glowColor}59 0%, ${glowColor}14 40%, transparent 65%)` }}
+                />
+              )}
               <SpriteImage
                 src={artwork ?? pokemon.sprites.front_default}
                 alt={pokemon.name}

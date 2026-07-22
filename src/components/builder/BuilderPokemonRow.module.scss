@@ -65,20 +65,35 @@
   margin-top: 0.125rem;
 }
 
+// Mobile: a fixed 3-column grid so all 6 stats land as a clean 3-and-3
+// block instead of flex-wrap's uneven "5 then 1 alone on its own line".
+// Desktop has the width to just let them sit in a single row.
 .stats {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 1.25rem;
-  margin-left: auto;
-  margin-right: 15px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem 0.5rem;
+  width: 100%;
+
+  @include sm {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 1.25rem;
+    width: auto;
+    margin-left: auto;
+    margin-right: 15px;
+  }
 }
 
 .statTile {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   gap: 0.125rem;
+
+  @include sm {
+    align-items: flex-end;
+  }
 }
 
 .statLabel {
